@@ -10,14 +10,8 @@ Arcade Vault (`README.md`): a platform for playing games online and competing fo
 
 The project follows Spec Driven Design via the `/spec` and `/spec-impl` skills from https://github.com/Klerith/fernando-skills (installed with `npx skills@latest add Klerith/fernando-skills`). Check for `.claude/skills/spec` and `.claude/skills/spec-impl` before starting feature work — if present, use them to drive the workflow instead of implementing ad hoc.
 
-## Commands
-
-- `npm run dev` — start the dev server (Next.js App Router, Turbopack by default)
-- `npm run build` — production build
-- `npm run start` — run the production build
-- `npm run lint` — ESLint (flat config, `eslint-config-next` core-web-vitals + typescript rules)
-
-No test runner is configured in `package.json` yet.
+## Skills
+Usa siempre /frontend-design para diseñar la interfaz de usuario. 
 
 ## Architecture
 
