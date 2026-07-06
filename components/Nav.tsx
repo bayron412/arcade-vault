@@ -6,8 +6,10 @@ import { useState } from 'react';
 import { useUser } from '@/app/context/UserContext';
 
 const LINKS = [
-  { href: '/', label: 'Biblioteca' },
+  { href: '/', label: 'Inicio' },
+  { href: '/games', label: 'Biblioteca' },
   { href: '/hall-of-fame', label: 'Salón de la Fama' },
+  { href: '/about', label: 'Acerca de' },
 ];
 
 const CREDITS = '03';
