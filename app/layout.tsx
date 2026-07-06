@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Press_Start_2P, JetBrains_Mono, Courier_Prime } from "next/font/google";
+import { UserProvider } from "./context/UserContext";
 import "./globals.css";
 
 const pressStart2P = Press_Start_2P({
@@ -38,7 +39,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <div className="av-bg" />
         <div className="av-noise" />
-        <div id="root">{children}</div>
+        <div id="root">
+          <UserProvider>{children}</UserProvider>
+        </div>
       </body>
     </html>
   );
