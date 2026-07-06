@@ -1,14 +1,22 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 import type { Game } from '@/app/data';
 
 const MAX_TILT = 10;
 
+const BUTTON_COLOR_CLASS: Partial<Record<Game['color'], string>> = {
+  magenta: 'magenta',
+  yellow: 'yellow',
+};
+
 export default function GameCard({ game }: { game: Game }) {
+  const router = useRouter();
   const cardRef = useRef<HTMLDivElement>(null);
   const frame = useRef<number | null>(null);
+
+  const goToGame = () => router.push(`/games/${game.id}`);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
@@ -39,23 +47,31 @@ export default function GameCard({ game }: { game: Game }) {
       className="card"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onClick={goToGame}
     >
       <div className="cover">
         <div className={`cover-bg ${game.cover}`} />
         <span className="label">{game.cat}</span>
       </div>
       <div className="meta">
-        <div className={`title neon-${game.color}`}>{game.title}</div>
+        <div className="title">{game.title}</div>
         <div className="desc">{game.short}</div>
       </div>
       <div className="row">
         <div className="score-badge">
-          MEJOR PUNTUACIÓN
-          <b>{game.best.toLocaleString('en-US')}</b>
+          <span>MEJOR PUNTUACIÓN</span>
+          <b>{game.best.toLocaleString('es-ES')}</b>
         </div>
-        <Link href={`/games/${game.id}`} className="btn">
+        <button
+          type="button"
+          className={`btn ${BUTTON_COLOR_CLASS[game.color] ?? ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            goToGame();
+          }}
+        >
           JUGAR
-        </Link>
+        </button>
       </div>
     </div>
   );

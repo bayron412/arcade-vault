@@ -6,7 +6,14 @@
       "Bash(curl -s http://localhost:3000/)",
       "Bash(curl -s http://localhost:3000/games/brick-breaker)",
       "Bash(curl -s http://localhost:3000/games/brick-breaker/play)",
-      "Bash(curl -s http://localhost:3000/auth)"
+      "Bash(curl -s http://localhost:3000/auth)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_take_screenshot",
+      "Bash(find / -maxdepth 6 -iname \"before-homepage.png\")",
+      "Read(//Users/bayrongiraldo/**)",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_type"
     ]
   }
 }

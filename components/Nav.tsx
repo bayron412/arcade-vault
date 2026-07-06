@@ -6,11 +6,11 @@ import { useState } from 'react';
 import { useUser } from '@/app/context/UserContext';
 
 const LINKS = [
-  { href: '/', label: 'BIBLIOTECA' },
-  { href: '/hall-of-fame', label: 'SALÓN DE LA FAMA' },
+  { href: '/', label: 'Biblioteca' },
+  { href: '/hall-of-fame', label: 'Salón de la Fama' },
 ];
 
-const CREDITS = 999;
+const CREDITS = '03';
 
 export default function Nav() {
   const pathname = usePathname();
@@ -24,7 +24,9 @@ export default function Nav() {
       <nav className="av-nav">
         <Link href="/" className="logo" onClick={closeDrawer}>
           <span className="logo-mark" />
-          <span className="logo-text">ARCADE VAULT</span>
+          <span className="logo-text neon-cyan">
+            ARCADE <span className="neon-magenta">VAULT</span>
+          </span>
         </Link>
 
         <div className="links">
@@ -43,17 +45,17 @@ export default function Nav() {
 
         <div className="coin-counter">
           <span className="coin" />
-          {CREDITS}
+          <span>CRÉDITOS · {CREDITS}</span>
         </div>
 
         <div className="auth-btn">
           {user ? (
             <button type="button" className="btn ghost" onClick={signOut}>
-              {user}
+              {user} ▾
             </button>
           ) : (
             <Link href="/auth" className="btn">
-              INICIAR SESIÓN
+              Iniciar Sesión
             </Link>
           )}
         </div>
@@ -62,9 +64,9 @@ export default function Nav() {
           type="button"
           className="hamburger btn ghost"
           onClick={() => setOpen((v) => !v)}
-          aria-label="Abrir menú"
+          aria-label="Menú"
         >
-          ☰
+          ≡
         </button>
       </nav>
 
@@ -73,6 +75,9 @@ export default function Nav() {
         onClick={closeDrawer}
       />
       <div className={`av-mobile-panel ${open ? 'open' : ''}`}>
+        <div className="pixel neon-cyan" style={{ fontSize: 11, marginBottom: 16 }}>
+          MENÚ
+        </div>
         {LINKS.map((link) => (
           <Link
             key={link.href}
@@ -83,26 +88,26 @@ export default function Nav() {
             {link.label}
           </Link>
         ))}
-        <div className="coin-counter">
-          <span className="coin" />
-          {CREDITS}
-        </div>
         {user ? (
-          <button
-            type="button"
-            className="btn ghost"
-            onClick={() => {
-              signOut();
-              closeDrawer();
-            }}
-          >
-            {user} — SALIR
-          </button>
+          <Link href="/" className="" onClick={() => { signOut(); closeDrawer(); }}>
+            Cerrar sesión ({user})
+          </Link>
         ) : (
-          <Link href="/auth" className="btn" onClick={closeDrawer}>
-            INICIAR SESIÓN
+          <Link
+            href="/auth"
+            className={pathname === '/auth' ? 'active' : ''}
+            onClick={closeDrawer}
+          >
+            Iniciar Sesión
           </Link>
         )}
+        <div style={{ flex: 1 }} />
+        <div
+          className="pixel"
+          style={{ fontSize: 9, color: 'var(--ink-faint)', letterSpacing: '0.16em' }}
+        >
+          CRÉDITOS · {CREDITS}
+        </div>
       </div>
     </>
   );

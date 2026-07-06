@@ -1,76 +1,82 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams, notFound } from 'next/navigation';
+import { useRouter, useParams, notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { GAMES } from '@/app/data';
 import { useUser } from '@/app/context/UserContext';
 
 export default function PlayPage() {
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const game = GAMES.find((g) => g.id === params.id);
   const { user } = useUser();
 
   const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(3);
+  const [lives] = useState(3);
   const [level, setLevel] = useState(1);
   const [paused, setPaused] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
-  const [nameInput, setNameInput] = useState(user ?? 'INVITADO');
+  const [over, setOver] = useState(false);
+  const [name, setName] = useState(user ?? 'INVITADO');
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    if (paused || gameOver) return;
-    const id = setInterval(() => {
-      setScore((s) => s + Math.floor(Math.random() * 40 + 10));
-    }, 1000);
-    return () => clearInterval(id);
-  }, [paused, gameOver]);
+    if (over || paused) return;
+    const t = setInterval(() => {
+      setScore((s) => s + Math.floor(10 + Math.random() * 90));
+    }, 220);
+    return () => clearInterval(t);
+  }, [over, paused]);
 
   useEffect(() => {
-    setLevel(1 + Math.floor(score / 2000));
+    if (score > 0 && score % 2500 < 100) setLevel((l) => l + 1);
   }, [score]);
 
   if (!game) notFound();
 
-  const handleFin = () => {
-    setGameOver(true);
-    setPaused(false);
-  };
+  const endGame = () => setOver(true);
 
-  const handleSave = () => {
-    setSaved(true);
+  const restart = () => {
+    setScore(0);
+    setLevel(1);
+    setPaused(false);
+    setOver(false);
+    setSaved(false);
   };
 
   return (
-    <div className="av-player">
+    <div className="av-player fade-in">
       <div className="player-hud">
-        <div className="hud-stat">
-          <span className="l">Jugador</span>
-          <span className="v">{user ?? 'INVITADO'}</span>
-        </div>
-        <div className="hud-stat">
-          <span className="l">Puntuación</span>
-          <span className="v">{score.toLocaleString('en-US')}</span>
-        </div>
-        <div className="hud-stat lives">
-          <span className="l">Vidas</span>
-          <span className="v">{'♥'.repeat(lives)}</span>
-        </div>
-        <div className="hud-stat level">
-          <span className="l">Nivel</span>
-          <span className="v">{level}</span>
+        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+          <div className="hud-stat">
+            <div className="l">Jugador</div>
+            <div className="v" style={{ color: 'var(--ink)' }}>
+              {name}
+            </div>
+          </div>
+          <div className="hud-stat">
+            <div className="l">Puntuación</div>
+            <div className="v">{score.toLocaleString('es-ES')}</div>
+          </div>
+          <div className="hud-stat lives">
+            <div className="l">Vidas</div>
+            <div className="v">{'♥ '.repeat(lives).trim() || '—'}</div>
+          </div>
+          <div className="hud-stat level">
+            <div className="l">Nivel</div>
+            <div className="v">{String(level).padStart(2, '0')}</div>
+          </div>
         </div>
         <div className="hud-actions">
-          <button type="button" className="btn ghost" onClick={() => setPaused((p) => !p)}>
+          <button type="button" className="btn yellow" onClick={() => setPaused((p) => !p)}>
             {paused ? 'REANUDAR' : 'PAUSA'}
           </button>
-          <button type="button" className="btn magenta" onClick={handleFin}>
+          <button type="button" className="btn magenta" onClick={endGame}>
             FIN
           </button>
-          <Link href={`/games/${game.id}`} className="btn ghost">
+          <button type="button" className="btn ghost" onClick={() => router.push(`/games/${game.id}`)}>
             SALIR
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -78,52 +84,62 @@ export default function PlayPage() {
         <div className="crt-screen">
           <div className="game-arena">
             <div className="grid-floor" />
-            <div className="player-ship" />
             <div className="enemy e1" />
             <div className="enemy e2" />
             <div className="enemy e3" />
+            <div className="player-ship" />
           </div>
+          {paused && (
+            <div className="crt-content" style={{ background: 'rgba(0,0,0,0.6)', zIndex: 5 }}>
+              <div>
+                <div className="pixel neon-yellow" style={{ fontSize: 22 }}>
+                  EN PAUSA
+                </div>
+                <div
+                  className="mono"
+                  style={{ fontSize: 11, color: 'var(--ink-dim)', marginTop: 10, letterSpacing: '0.16em' }}
+                >
+                  PULSA REANUDAR PARA CONTINUAR
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <div className="crt-bottom">
-          <span className={`neon-${game.color}`}>{game.title}</span>
-          <span className="led">EN LÍNEA</span>
+          <span className="led">SEÑAL OK</span>
+          <span>
+            {game.title} · CRT-83 · 60 HZ
+          </span>
+          <span>CARGA · 1MB</span>
         </div>
       </div>
 
-      {paused && !gameOver && (
+      {over && (
         <div className="modal-bd">
           <div className="modal">
-            <h2>PAUSA</h2>
-            <p>El juego está en pausa.</p>
-            <div className="actions">
-              <button type="button" className="btn" onClick={() => setPaused(false)}>
-                REANUDAR
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {gameOver && (
-        <div className="modal-bd">
-          <div className="modal">
-            <h2>GAME OVER</h2>
+            <h2>FIN DEL JUEGO</h2>
             <div className="final-label">Puntuación final</div>
-            <div className="final">{score.toLocaleString('en-US')}</div>
-            <div className="input-row">
-              <input
-                type="text"
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
-              />
-              <button type="button" className="btn" onClick={handleSave}>
-                GUARDAR
-              </button>
-            </div>
-            {saved && <div className="toast-saved">PUNTUACIÓN GUARDADA</div>}
+            <div className="final">{score.toLocaleString('es-ES')}</div>
+            {!saved ? (
+              <div className="input-row">
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value.toUpperCase().slice(0, 10))}
+                  placeholder="TUS INICIALES"
+                />
+                <button type="button" className="btn yellow" onClick={() => setSaved(true)}>
+                  GUARDAR PUNTUACIÓN
+                </button>
+              </div>
+            ) : (
+              <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
+            )}
             <div className="actions">
-              <Link href={`/games/${game.id}`} className="btn ghost">
-                SALIR
+              <button type="button" className="btn" onClick={restart}>
+                JUGAR DE NUEVO
+              </button>
+              <Link href="/" className="btn magenta">
+                VOLVER AL VAULT
               </Link>
             </div>
           </div>

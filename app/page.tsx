@@ -26,11 +26,11 @@ export default function Home() {
   }, [category, query]);
 
   return (
-    <>
+    <div className="fade-in">
       <section className="av-hero">
         <h1 className="flicker">ARCADE VAULT</h1>
         <p className="sub">
-          INSERTA CRÉDITOS PARA CONTINUAR<span className="blink">_</span>
+          INSERTA UNA MONEDA PARA JUGAR <span className="blink">_</span>
         </p>
       </section>
 
@@ -39,7 +39,7 @@ export default function Home() {
           <span className="ico">⌕</span>
           <input
             type="text"
-            placeholder="BUSCAR JUEGO..."
+            placeholder="Buscar un juego por nombre…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -62,7 +62,25 @@ export default function Home() {
         {filtered.map((game) => (
           <GameCard key={game.id} game={game} />
         ))}
+        {filtered.length === 0 && (
+          <div
+            style={{
+              gridColumn: '1 / -1',
+              textAlign: 'center',
+              padding: 80,
+              color: 'var(--ink-faint)',
+            }}
+          >
+            <div
+              className="pixel"
+              style={{ fontSize: 14, color: 'var(--magenta)', marginBottom: 12 }}
+            >
+              NO HAY RESULTADOS
+            </div>
+            <div>Intenta otra búsqueda o categoría.</div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

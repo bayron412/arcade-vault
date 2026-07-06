@@ -1,31 +1,27 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { GAMES, seededScores, type ScoreEntry } from '@/app/data';
+import { GAMES, seededScores } from '@/app/data';
 import { useUser } from '@/app/context/UserContext';
 
 export default function HallOfFamePage() {
   const { user } = useUser();
-  const [activeId, setActiveId] = useState(GAMES[0].id);
-  const game = GAMES.find((g) => g.id === activeId) ?? GAMES[0];
+  const [tab, setTab] = useState(GAMES[0].id);
+  const game = GAMES.find((g) => g.id === tab) ?? GAMES[0];
 
-  const entries = useMemo<ScoreEntry[]>(() => {
-    const base = seededScores(game.id.length + game.best, 15);
-    if (!user) return base;
+  const rows = useMemo(() => seededScores(tab.length * 23 + 7, 12), [tab]);
 
-    const youRank = Math.min(7, base.length);
-    return base.map((entry) =>
-      entry.rank === youRank ? { ...entry, name: user } : entry,
-    );
-  }, [game, user]);
-
-  const [first, second, third] = entries;
+  const youRank = user ? Math.floor(8 + (tab.length % 4)) : null;
+  const youScore = user ? rows[5]?.score - 2400 : null;
 
   return (
-    <div className="av-hall">
+    <div className="av-hall fade-in">
       <div className="hall-head">
         <h1>SALÓN DE LA FAMA</h1>
-        <p>Las leyendas del Arcade Vault, juego por juego.</p>
+        <p className="pixel" style={{ fontSize: 10 }}>
+          LOS NOMBRES QUE NUNCA SE BORRAN DE LA PANTALLA
+        </p>
       </div>
 
       <div className="hall-tabs">
@@ -33,8 +29,8 @@ export default function HallOfFamePage() {
           <button
             key={g.id}
             type="button"
-            className={`chip ${g.id === activeId ? 'active' : ''}`}
-            onClick={() => setActiveId(g.id)}
+            className={`chip ${tab === g.id ? 'active' : ''}`}
+            onClick={() => setTab(g.id)}
           >
             {g.title}
           </button>
@@ -42,51 +38,79 @@ export default function HallOfFamePage() {
       </div>
 
       <div className="podium">
-        <PodiumSlot rank="silver" entry={second} />
-        <PodiumSlot rank="gold" entry={first} />
-        <PodiumSlot rank="bronze" entry={third} />
+        <div className="podium-slot silver">
+          <div className="rank-num">02</div>
+          <div className="name">{rows[1].name}</div>
+          <div className="score">{rows[1].score.toLocaleString('es-ES')}</div>
+          <div className="date">{rows[1].date}</div>
+        </div>
+        <div className="podium-slot gold">
+          <div className="pixel" style={{ fontSize: 9, color: 'var(--gold)', letterSpacing: '0.18em' }}>
+            CAMPEÓN
+          </div>
+          <div className="rank-num" style={{ fontSize: 36, marginTop: 4 }}>
+            01
+          </div>
+          <div className="name">{rows[0].name}</div>
+          <div className="score" style={{ fontSize: 20 }}>
+            {rows[0].score.toLocaleString('es-ES')}
+          </div>
+          <div className="date">{rows[0].date}</div>
+        </div>
+        <div className="podium-slot bronze">
+          <div className="rank-num">03</div>
+          <div className="name">{rows[2].name}</div>
+          <div className="score">{rows[2].score.toLocaleString('es-ES')}</div>
+          <div className="date">{rows[2].date}</div>
+        </div>
       </div>
 
       <div className="hall-table">
         <div className="th">
-          <span>RANK</span>
-          <span>JUGADOR</span>
-          <span>PUNTUACIÓN</span>
-          <span>FECHA</span>
+          <div>RANGO</div>
+          <div>JUGADOR</div>
+          <div>PUNTUACIÓN</div>
+          <div>FECHA</div>
         </div>
-        {entries.map((entry, i) => (
+        {rows.map((r, i) => (
           <div
-            key={entry.rank}
-            className={`tr ${entry.rank <= 3 ? `top${entry.rank}` : ''} ${
-              entry.name === user ? 'you' : ''
-            }`}
-            style={{ animationDelay: `${i * 40}ms` }}
+            key={r.name + i}
+            className={`tr ${i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : ''}`}
+            style={{ animationDelay: `${i * 50}ms` }}
           >
-            <span className="rk">#{entry.rank}</span>
-            <span className="pl">{entry.name}</span>
-            <span className="sc">{entry.score.toLocaleString('en-US')}</span>
-            <span className="dt">{entry.date}</span>
+            <div className="rk">#{String(r.rank).padStart(2, '0')}</div>
+            <div className="pl">{r.name}</div>
+            <div className="sc">{r.score.toLocaleString('es-ES')}</div>
+            <div className="dt">{r.date}</div>
           </div>
         ))}
+        {user && (
+          <>
+            <div className="tr you-label">▸ TU MEJOR MARCA EN {game.title}</div>
+            <div className="tr you" style={{ animationDelay: `${rows.length * 50 + 50}ms` }}>
+              <div className="rk" style={{ color: 'var(--yellow)' }}>
+                #{String(youRank).padStart(2, '0')}
+              </div>
+              <div className="pl" style={{ color: 'var(--yellow)' }}>
+                {user}
+              </div>
+              <div
+                className="sc"
+                style={{ color: 'var(--yellow)', textShadow: '0 0 6px rgba(245,255,0,0.5)' }}
+              >
+                {(youScore || 9999).toLocaleString('es-ES')}
+              </div>
+              <div className="dt">11/05/2026</div>
+            </div>
+          </>
+        )}
       </div>
-    </div>
-  );
-}
 
-function PodiumSlot({
-  rank,
-  entry,
-}: {
-  rank: 'gold' | 'silver' | 'bronze';
-  entry: ScoreEntry;
-}) {
-  const rankNum = rank === 'gold' ? 1 : rank === 'silver' ? 2 : 3;
-  return (
-    <div className={`podium-slot ${rank}`}>
-      <div className="rank-num">{rankNum}</div>
-      <div className="name">{entry.name}</div>
-      <div className="score">{entry.score.toLocaleString('en-US')}</div>
-      <div className="date">{entry.date}</div>
+      <div style={{ textAlign: 'center', marginTop: 32 }}>
+        <Link href="/" className="btn lg">
+          VOLVER A LA BIBLIOTECA
+        </Link>
+      </div>
     </div>
   );
 }
