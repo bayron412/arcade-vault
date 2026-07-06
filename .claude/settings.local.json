@@ -5,7 +5,8 @@
       "Bash(npx next *)",
       "Bash(curl -s http://localhost:3000/)",
       "Bash(curl -s http://localhost:3000/games/brick-breaker)",
-      "Bash(curl -s http://localhost:3000/games/brick-breaker/play)"
+      "Bash(curl -s http://localhost:3000/games/brick-breaker/play)",
+      "Bash(curl -s http://localhost:3000/auth)"
     ]
   }
 }
