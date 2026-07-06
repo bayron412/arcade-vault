@@ -17,7 +17,8 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/games)",
       "Bash(curl -s -o /dev/null -w \"games:%{http_code} home:\" http://localhost:3000/games)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)"
     ]
   }
 }
