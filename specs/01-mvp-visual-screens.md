@@ -1,6 +1,6 @@
 # SPEC 01 — Pantallas visuales del MVP de Arcade Vault
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** —
 > **Date:** 2026-07-06
 > **Objective:** Implementar la interfaz visual completa de Arcade Vault (biblioteca, detalle de juego, pantalla de juego estática, inicio de sesión y salón de la fama) como rutas reales de Next.js App Router, sin ninguna lógica de juego real.
