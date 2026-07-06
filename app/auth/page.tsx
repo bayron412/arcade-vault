@@ -17,12 +17,12 @@ export default function AuthPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     login((username || 'PLAYER1').toUpperCase().slice(0, 10));
-    router.push('/');
+    router.push('/games');
   };
 
   const handleGuest = () => {
     signOut();
-    router.push('/');
+    router.push('/games');
   };
 
   return (
