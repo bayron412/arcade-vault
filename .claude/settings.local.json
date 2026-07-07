@@ -18,7 +18,13 @@
       "Bash(curl -s -o /dev/null -w \"games:%{http_code} home:\" http://localhost:3000/games)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
       "Bash(npx tsc *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_evaluate",
+      "Bash(pip3 install *)",
+      "Bash(python3 -c ' *)",
+      "Bash(sort -t: -k1 -n -u)",
+      "Bash(python3 *)"
     ]
   }
 }
