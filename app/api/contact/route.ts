@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     const { error } = await resend.emails.send({
       from: "onboarding@resend.dev",
-      to: "bayron412labs@gmail.com",
+      to: process.env.CONTACT_EMAIL_TO!,
       subject: `Nuevo mensaje de contacto — ${name}`,
       html: `<p><strong>Nombre:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Mensaje:</strong> ${msg}</p>`,
     });
