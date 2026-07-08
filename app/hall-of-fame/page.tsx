@@ -107,7 +107,7 @@ export default function HallOfFamePage() {
       </div>
 
       <div style={{ textAlign: 'center', marginTop: 32 }}>
-        <Link href="/" className="btn lg">
+        <Link href="/games" className="btn lg">
           VOLVER A LA BIBLIOTECA
         </Link>
       </div>
