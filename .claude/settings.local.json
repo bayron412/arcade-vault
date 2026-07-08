@@ -26,5 +26,9 @@
       "Bash(sort -t: -k1 -n -u)",
       "Bash(python3 *)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ],
+  "enableAllProjectMcpServers": true
 }
