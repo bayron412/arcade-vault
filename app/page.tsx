@@ -20,13 +20,55 @@ interface TopPlayerEntry {
 }
 
 const TICKER: TickerEntry[] = [
-  { player: 'NEONFOX', game: 'Caída', score: 184220, time: 'hace 2 min', color: 'magenta' },
-  { player: 'PX_KAI', game: 'Glotón', score: 96400, time: 'hace 5 min', color: 'yellow' },
-  { player: 'Z3R0COOL', game: 'Invasores', score: 54190, time: 'hace 8 min', color: 'green' },
-  { player: 'VAULT_07', game: 'Rocas', score: 41200, time: 'hace 12 min', color: 'cyan' },
-  { player: 'GLITCHA', game: 'Bloque Buster', score: 28450, time: 'hace 18 min', color: 'cyan' },
-  { player: 'ARKADYA', game: 'Serpentina', score: 7820, time: 'hace 24 min', color: 'green' },
-  { player: 'CYBER_LU', game: 'Ranaria', score: 18900, time: 'hace 31 min', color: 'yellow' },
+  {
+    player: 'NEONFOX',
+    game: 'Caída',
+    score: 184220,
+    time: 'hace 2 min',
+    color: 'magenta',
+  },
+  {
+    player: 'PX_KAI',
+    game: 'Glotón',
+    score: 96400,
+    time: 'hace 5 min',
+    color: 'yellow',
+  },
+  {
+    player: 'Z3R0COOL',
+    game: 'Invasores',
+    score: 54190,
+    time: 'hace 8 min',
+    color: 'green',
+  },
+  {
+    player: 'VAULT_07',
+    game: 'Rocas',
+    score: 41200,
+    time: 'hace 12 min',
+    color: 'cyan',
+  },
+  {
+    player: 'GLITCHA',
+    game: 'Bloque Buster',
+    score: 28450,
+    time: 'hace 18 min',
+    color: 'cyan',
+  },
+  {
+    player: 'ARKADYA',
+    game: 'Serpentina',
+    score: 7820,
+    time: 'hace 24 min',
+    color: 'green',
+  },
+  {
+    player: 'CYBER_LU',
+    game: 'Ranaria',
+    score: 18900,
+    time: 'hace 31 min',
+    color: 'yellow',
+  },
 ];
 
 const TOP_PLAYERS: TopPlayerEntry[] = [
@@ -133,7 +175,15 @@ function FloatingSilhouettes() {
         <g fill="#00ff88">
           <rect x="10" y="0" width="4" height="24" />
           <rect x="0" y="10" width="24" height="4" />
-          <rect x="6" y="6" width="12" height="12" fill="none" stroke="#00ff88" strokeWidth="2" />
+          <rect
+            x="6"
+            y="6"
+            width="12"
+            height="12"
+            fill="none"
+            stroke="#00ff88"
+            strokeWidth="2"
+          />
         </g>
       </svg>
       <svg className="silo s5" viewBox="0 0 36 24">
@@ -186,7 +236,11 @@ function FloatingSilhouettes() {
   );
 }
 
-function FeatureIcon({ kind }: { kind: 'GAMEPAD' | 'FREE' | 'TROPHY' | 'ROCKET' }) {
+function FeatureIcon({
+  kind,
+}: {
+  kind: 'GAMEPAD' | 'FREE' | 'TROPHY' | 'ROCKET';
+}) {
   const C = 'currentColor';
   if (kind === 'GAMEPAD') {
     return (
@@ -207,7 +261,15 @@ function FeatureIcon({ kind }: { kind: 'GAMEPAD' | 'FREE' | 'TROPHY' | 'ROCKET' 
     return (
       <svg className="ft-icon" viewBox="0 0 16 16">
         <g fill={C}>
-          <rect x="3" y="3" width="10" height="10" fill="none" stroke={C} strokeWidth="1.5" />
+          <rect
+            x="3"
+            y="3"
+            width="10"
+            height="10"
+            fill="none"
+            stroke={C}
+            strokeWidth="1.5"
+          />
           <rect x="5" y="6" width="1.5" height="4" />
           <rect x="5" y="6" width="4" height="1.5" />
           <rect x="5" y="8" width="3" height="1" />
@@ -277,10 +339,10 @@ export default function Home() {
               ✦ CREAR CUENTA
             </Link>
           </div>
-          <div className="hero-scroll" aria-hidden="true">
-            <span>DESLIZA</span>
-            <span className="arrow">▼</span>
-          </div>
+        </div>
+        <div className="hero-scroll" aria-hidden="true">
+          <span>DESLIZA</span>
+          <span className="arrow">▼</span>
         </div>
       </section>
 
@@ -326,7 +388,11 @@ export default function Home() {
       <section className="home-stats reveal">
         <div className="stats-inner">
           {STATS.map((st, i) => (
-            <div key={st.u} className="stat-block" style={{ transitionDelay: `${i * 90}ms` }}>
+            <div
+              key={st.u}
+              className="stat-block"
+              style={{ transitionDelay: `${i * 90}ms` }}
+            >
               <div className="stat-n neon-yellow">{st.n}</div>
               <div className="stat-u pixel">{st.u}</div>
               <div className="stat-s">{st.s}</div>
@@ -353,9 +419,13 @@ export default function Home() {
                   className="tick-row"
                   style={{ animationDelay: `${i * 60}ms` }}
                 >
-                  <span className={`tk-p neon-${entry.color}`}>{entry.player}</span>
+                  <span className={`tk-p neon-${entry.color}`}>
+                    {entry.player}
+                  </span>
                   <span className="tk-mid">▸ {entry.game}</span>
-                  <span className="tk-s">+{entry.score.toLocaleString('es-ES')}</span>
+                  <span className="tk-s">
+                    +{entry.score.toLocaleString('es-ES')}
+                  </span>
                   <span className="tk-t">{entry.time}</span>
                 </div>
               ))}
@@ -364,7 +434,9 @@ export default function Home() {
 
           <div className="activity-card">
             <div className="ac-head">
-              <div className="ac-title pixel neon-magenta">▸ TOP JUGADORES · HOY</div>
+              <div className="ac-title pixel neon-magenta">
+                ▸ TOP JUGADORES · HOY
+              </div>
               <Link href="/hall-of-fame" className="lb-link">
                 VER SALÓN →
               </Link>
@@ -375,12 +447,19 @@ export default function Home() {
                   key={entry.player}
                   className={`top-row ${i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : ''}`}
                 >
-                  <span className="tp-rk">#{String(entry.rank).padStart(2, '0')}</span>
+                  <span className="tp-rk">
+                    #{String(entry.rank).padStart(2, '0')}
+                  </span>
                   <span className="tp-bar">
-                    <span className="tp-fill" style={{ width: `${100 - i * 16}%` }} />
+                    <span
+                      className="tp-fill"
+                      style={{ width: `${100 - i * 16}%` }}
+                    />
                   </span>
                   <span className="tp-p">{entry.player}</span>
-                  <span className="tp-s">{entry.score.toLocaleString('es-ES')}</span>
+                  <span className="tp-s">
+                    {entry.score.toLocaleString('es-ES')}
+                  </span>
                 </div>
               ))}
             </div>
@@ -411,7 +490,11 @@ export default function Home() {
               <li>✔ Nuevos juegos cada mes</li>
               <li>✔ Funciona en cualquier navegador</li>
             </ul>
-            <Link href="/auth" className="btn xl pulse" style={{ width: '100%' }}>
+            <Link
+              href="/auth"
+              className="btn xl pulse"
+              style={{ width: '100%' }}
+            >
               EMPEZAR GRATIS →
             </Link>
             <div className="pc-foot">No pedimos tarjeta. Nunca lo haremos.</div>
@@ -426,22 +509,23 @@ export default function Home() {
             <div className="faq-item">
               <div className="faq-q pixel">¿REALMENTE ES GRATIS?</div>
               <div className="faq-a">
-                Sí. Arcade Vault es un proyecto sin fines de lucro hecho por amor a los clásicos. No
-                hay versión &quot;premium&quot; escondida.
+                Sí. Arcade Vault es un proyecto sin fines de lucro hecho por
+                amor a los clásicos. No hay versión &quot;premium&quot;
+                escondida.
               </div>
             </div>
             <div className="faq-item">
               <div className="faq-q pixel">¿NECESITO CREAR CUENTA?</div>
               <div className="faq-a">
-                No. Puedes jugar como invitado. Si quieres guardar tu puntuación y aparecer en el
-                ranking, regístrate en 10 segundos.
+                No. Puedes jugar como invitado. Si quieres guardar tu puntuación
+                y aparecer en el ranking, regístrate en 10 segundos.
               </div>
             </div>
             <div className="faq-item">
               <div className="faq-q pixel">¿CÓMO SOBREVIVEN SIN COBRAR?</div>
               <div className="faq-a">
-                Es un proyecto comunitario. Si te gusta, compártelo. Esa es toda la moneda que
-                aceptamos.
+                Es un proyecto comunitario. Si te gusta, compártelo. Esa es toda
+                la moneda que aceptamos.
               </div>
             </div>
           </div>
@@ -453,7 +537,9 @@ export default function Home() {
         <Link href="/games" className="btn xl pulse final-cta">
           INSERTAR MONEDA →
         </Link>
-        <div className="final-tag">Gratis. Sin registro obligatorio. Empieza en segundos.</div>
+        <div className="final-tag">
+          Gratis. Sin registro obligatorio. Empieza en segundos.
+        </div>
       </section>
     </div>
   );
