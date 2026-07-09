@@ -100,13 +100,19 @@ son utilidades de configuración, no estructuras de datos.
 
 ## Acceptance criteria
 
-- [ ] `@supabase/supabase-js` y `@supabase/ssr` aparecen en `dependencies` de `package.json`.
-- [ ] `.env.local` contiene `NEXT_PUBLIC_SUPABASE_URL=` y `NEXT_PUBLIC_SUPABASE_ANON_KEY=`.
-- [ ] `.env.template` contiene las mismas dos claves como placeholders documentados.
-- [ ] `lib/supabase/client.ts` existe y exporta `createClient` usando `createBrowserClient`.
-- [ ] `lib/supabase/server.ts` existe y exporta `createClient` async usando `createServerClient`.
-- [ ] `npm run build` completa sin errores de TypeScript relacionados con los nuevos archivos.
-- [ ] Ninguna página o componente existente se rompe tras la integración.
+- [x] `@supabase/supabase-js` y `@supabase/ssr` aparecen en `dependencies` de `package.json`.
+- [x] `.env.local` contiene `NEXT_PUBLIC_SUPABASE_URL=` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=`.
+- [x] `.env.template` contiene las mismas dos claves como placeholders documentados.
+- [x] `lib/supabase/client.ts` existe y exporta `createClient` usando `createBrowserClient`.
+- [x] `lib/supabase/server.ts` existe y exporta `createClient` async usando `createServerClient`.
+- [x] `npm run build` completa sin errores de TypeScript relacionados con los nuevos archivos.
+- [x] Ninguna página o componente existente se rompe tras la integración.
+
+> **Nota de implementación:** `.env.local` y `.env.template` ya tenían definida
+> `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (con valor real en `.env.local`) en lugar de
+> `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Por decisión del usuario, `lib/supabase/client.ts` y
+> `lib/supabase/server.ts` usan `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` para reutilizar la
+> variable existente en vez de duplicar credenciales bajo un nombre distinto.
 
 ---
 
