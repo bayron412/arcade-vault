@@ -631,5 +631,12 @@ export default function AsteroidsGame({
     };
   }, []);
 
-  return <canvas ref={canvasRef} width={W} height={H} />;
+  return (
+    <canvas
+      ref={canvasRef}
+      width={W}
+      height={H}
+      style={{ width: '100%', height: '100%', display: 'block' }}
+    />
+  );
 }
