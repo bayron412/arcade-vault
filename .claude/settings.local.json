@@ -24,11 +24,13 @@
       "Bash(pip3 install *)",
       "Bash(python3 -c ' *)",
       "Bash(sort -t: -k1 -n -u)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "mcp__playwright__browser_press_key",
+      "mcp__playwright__browser_snapshot"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "supabase"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

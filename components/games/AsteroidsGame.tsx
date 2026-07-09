@@ -54,8 +54,16 @@ export default function AsteroidsGame({
     // ── Input ─────────────────────────────────────────────────────────────
     const keys: Record<string, boolean> = {};
     const justPressed: Record<string, boolean> = {};
+    const GAME_KEYS = new Set([
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+      'Space',
+    ]);
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (GAME_KEYS.has(e.code)) e.preventDefault();
       if (!keys[e.code]) justPressed[e.code] = true;
       keys[e.code] = true;
     };
