@@ -1,6 +1,6 @@
 # SPEC 04 — Integración de Supabase
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** 03-about-contacto-resend ·
 > **Fecha:** 2026-05-14
 > **Objetivo:** Instalar y configurar el cliente de Supabase (browser + SSR) como
