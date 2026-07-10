@@ -26,7 +26,13 @@
       "Bash(sort -t: -k1 -n -u)",
       "Bash(python3 *)",
       "mcp__playwright__browser_press_key",
-      "mcp__playwright__browser_snapshot"
+      "mcp__playwright__browser_snapshot",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__execute_sql",
+      "Bash(ps -p 22379 -o pid,command,lstart)",
+      "Bash(lsof -ti:3000)",
+      "Bash(lsof -ti:3001)"
     ]
   },
   "enableAllProjectMcpServers": true,

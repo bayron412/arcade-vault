@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { GAMES } from '@/app/data';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/app/context/UserContext';
 
 const AsteroidsGame = dynamic(
@@ -12,7 +12,7 @@ const AsteroidsGame = dynamic(
   { ssr: false },
 );
 
-const game = GAMES.find((g) => g.id === 'asteroids');
+const game = { id: 'asteroids', title: 'ASTEROIDS' };
 
 export default function AsteroidsPlayPage() {
   const router = useRouter();
@@ -27,7 +27,63 @@ export default function AsteroidsPlayPage() {
   const [saved, setSaved] = useState(false);
   const [gameKey, setGameKey] = useState(0);
 
-  if (!game) return null;
+  const crtScreenRef = useRef<HTMLDivElement>(null);
+  const crtBottomRef = useRef<HTMLDivElement>(null);
+  const [screenWidth, setScreenWidth] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const screenEl = crtScreenRef.current;
+    if (!screenEl) return;
+
+    const recompute = () => {
+      const container = screenEl.parentElement;
+      if (!container) return;
+
+      const containerStyle = window.getComputedStyle(container);
+      const paddingX =
+        parseFloat(containerStyle.paddingLeft) +
+        parseFloat(containerStyle.paddingRight);
+      const availableWidth = container.clientWidth - paddingX;
+      const top = screenEl.getBoundingClientRect().top;
+      const bottomReserved =
+        (crtBottomRef.current?.offsetHeight ?? 24) + 14 + 24 + 24;
+      const availableHeight = window.innerHeight - top - bottomReserved;
+
+      const widthFromHeight = Math.max(200, availableHeight * (4 / 3));
+      setScreenWidth(Math.max(200, Math.min(availableWidth, widthFromHeight)));
+    };
+
+    recompute();
+    window.addEventListener('resize', recompute);
+    window.addEventListener('orientationchange', recompute);
+    const ro = new ResizeObserver(recompute);
+    ro.observe(screenEl.parentElement as Element);
+
+    return () => {
+      window.removeEventListener('resize', recompute);
+      window.removeEventListener('orientationchange', recompute);
+      ro.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!over) return;
+    const stored = localStorage.getItem('av_player_name');
+    if (stored) setName(stored);
+  }, [over]);
+
+  const saveScore = async () => {
+    localStorage.setItem('av_player_name', name);
+    setSaved(true);
+
+    const supabase = createClient();
+    await supabase.from('scores').insert({
+      game_id: game.id,
+      player_name: name,
+      score,
+      user_id: null,
+    });
+  };
 
   const restart = () => {
     setScore(0);
@@ -81,7 +137,13 @@ export default function AsteroidsPlayPage() {
       </div>
 
       <div className="crt">
-        <div className="crt-screen">
+        <div
+          ref={crtScreenRef}
+          className="crt-screen"
+          style={
+            screenWidth ? { width: screenWidth, margin: '0 auto' } : undefined
+          }
+        >
           <AsteroidsGame
             key={gameKey}
             paused={paused}
@@ -114,7 +176,7 @@ export default function AsteroidsPlayPage() {
             </div>
           )}
         </div>
-        <div className="crt-bottom">
+        <div ref={crtBottomRef} className="crt-bottom">
           <span className="led">SEÑAL OK</span>
           <span>{game.title} · CRT-83 · 60 HZ</span>
           <span>CARGA · 1MB</span>
@@ -139,7 +201,7 @@ export default function AsteroidsPlayPage() {
                 <button
                   type="button"
                   className="btn yellow"
-                  onClick={() => setSaved(true)}
+                  onClick={saveScore}
                 >
                   GUARDAR PUNTUACIÓN
                 </button>

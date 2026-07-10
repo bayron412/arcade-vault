@@ -1,16 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import type { Game } from '@/app/data';
+import type { GameRow } from '@/lib/supabase/types';
 
-export default function MiniCard({ game }: { game: Game }) {
+export default function MiniCard({ game }: { game: GameRow }) {
   const router = useRouter();
 
   return (
-    <div
-      className="mini-card"
-      onClick={() => router.push(`/games/${game.id}`)}
-    >
+    <div className="mini-card" onClick={() => router.push(`/games/${game.id}`)}>
       <div className="mini-cover">
         <div className={`cover-bg ${game.cover}`} />
       </div>

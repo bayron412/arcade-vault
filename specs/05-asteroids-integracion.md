@@ -1,6 +1,6 @@
 # SPEC 05 — Integración del juego Asteroids
 
-> **Estado:** Aprobado
+> **Estado:** implementado
 > **Depende de:** 04-supabase-integration
 > **Fecha:** 2026-05-15
 > **Objetivo:** Integrar el juego Asteroids (canvas puro) como un nuevo juego jugable
