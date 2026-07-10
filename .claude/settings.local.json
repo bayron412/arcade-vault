@@ -26,7 +26,10 @@
       "Bash(sort -t: -k1 -n -u)",
       "Bash(python3 *)",
       "mcp__playwright__browser_press_key",
-      "mcp__playwright__browser_snapshot"
+      "mcp__playwright__browser_snapshot",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__execute_sql"
     ]
   },
   "enableAllProjectMcpServers": true,
