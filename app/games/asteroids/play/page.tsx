@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { GAMES } from '@/app/data';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/app/context/UserContext';
 
 const AsteroidsGame = dynamic(
@@ -12,7 +12,7 @@ const AsteroidsGame = dynamic(
   { ssr: false },
 );
 
-const game = GAMES.find((g) => g.id === 'asteroids');
+const game = { id: 'asteroids', title: 'ASTEROIDS' };
 
 export default function AsteroidsPlayPage() {
   const router = useRouter();
@@ -27,7 +27,24 @@ export default function AsteroidsPlayPage() {
   const [saved, setSaved] = useState(false);
   const [gameKey, setGameKey] = useState(0);
 
-  if (!game) return null;
+  useEffect(() => {
+    if (!over) return;
+    const stored = localStorage.getItem('av_player_name');
+    if (stored) setName(stored);
+  }, [over]);
+
+  const saveScore = async () => {
+    localStorage.setItem('av_player_name', name);
+    setSaved(true);
+
+    const supabase = createClient();
+    await supabase.from('scores').insert({
+      game_id: game.id,
+      player_name: name,
+      score,
+      user_id: null,
+    });
+  };
 
   const restart = () => {
     setScore(0);
@@ -139,7 +156,7 @@ export default function AsteroidsPlayPage() {
                 <button
                   type="button"
                   className="btn yellow"
-                  onClick={() => setSaved(true)}
+                  onClick={saveScore}
                 >
                   GUARDAR PUNTUACIÓN
                 </button>
