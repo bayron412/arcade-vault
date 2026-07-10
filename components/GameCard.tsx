@@ -2,16 +2,20 @@
 
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
-import type { Game } from '@/app/data';
+import type { GameRow } from '@/lib/supabase/types';
 
 const MAX_TILT = 10;
 
-const BUTTON_COLOR_CLASS: Partial<Record<Game['color'], string>> = {
+const BUTTON_COLOR_CLASS: Partial<Record<GameRow['color'], string>> = {
   magenta: 'magenta',
   yellow: 'yellow',
 };
 
-export default function GameCard({ game }: { game: Game }) {
+export default function GameCard({
+  game,
+}: {
+  game: GameRow & { best: number };
+}) {
   const router = useRouter();
   const cardRef = useRef<HTMLDivElement>(null);
   const frame = useRef<number | null>(null);
