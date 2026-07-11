@@ -1,6 +1,6 @@
 # SPEC 09 — Integración del juego SNAKE
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** 06-leaderboard-scores
 > **Fecha:** 2026-07-11
 > **Objetivo:** Integrar SNAKE como juego jugable en Arcade Vault, con mecánica de grid implementada desde cero y sprites de frutas del atlas `references/source-assets/snake-assets/`, conectando el leaderboard de Supabase.
@@ -138,28 +138,28 @@ No se introducen nuevas tablas ni tipos TypeScript — se reutilizan `GameRow` y
 
 ## Acceptance criteria
 
-- [ ] La card de SNAKE aparece en `/games` con `cover-snake` y color `green`.
-- [ ] `/games/snake` carga con los datos reales del juego y el leaderboard top 10.
-- [ ] `/games/snake/play` carga sin errores de SSR ni de TypeScript.
-- [ ] El canvas renderiza un grid 20×20 y es jugable con flechas y WASD.
-- [ ] Un input que invertiría 180° la dirección actual se ignora (no causa colisión inmediata).
-- [ ] La comida se dibuja usando un sprite aleatorio de `fruits.png` (no un cuadrado sólido).
-- [ ] Comer una fruta incrementa `score` en 10 y `length` en 1, y genera una nueva fruta en una celda libre.
-- [ ] El HUD React de la plataforma refleja en tiempo real `score` y `length`.
-- [ ] El botón "PAUSA" congela el movimiento de la serpiente; "REANUDAR" lo reanuda.
-- [ ] Chocar contra la propia cola termina la partida.
-- [ ] Chocar contra el borde del tablero termina la partida (sin wrap-around).
-- [ ] Al terminar la partida, aparece el modal React de game over con la puntuación final.
-- [ ] El canvas no dibuja ningún overlay "GAME OVER" propio.
-- [ ] El botón "JUGAR DE NUEVO" reinicia la partida desde cero (longitud 3, score 0).
-- [ ] Al abrir el modal, el campo de nombre se pre-rellena con `av_player_name` de localStorage si existe.
-- [ ] Al confirmar, el score se inserta en Supabase y el nombre se persiste en localStorage.
-- [ ] El botón "GUARDAR PUNTUACIÓN" se deshabilita tras el primer envío (sin doble inserción).
-- [ ] El score guardado aparece en `/games/snake` y en `/hall-of-fame` al recargar.
-- [ ] Cuando no hay scores, el leaderboard muestra "Sé el primero en entrar al salón de la fama".
-- [ ] `/hall-of-fame` muestra un tab para SNAKE.
-- [ ] `npm run build` completa sin errores de TypeScript.
-- [ ] Ninguna ruta existente devuelve 500.
+- [x] La card de SNAKE aparece en `/games` con `cover-snake` y color `green`.
+- [x] `/games/snake` carga con los datos reales del juego y el leaderboard top 10.
+- [x] `/games/snake/play` carga sin errores de SSR ni de TypeScript.
+- [x] El canvas renderiza un grid 20×20 y es jugable con flechas y WASD.
+- [x] Un input que invertiría 180° la dirección actual se ignora (no causa colisión inmediata).
+- [x] La comida se dibuja usando un sprite aleatorio de `fruits.png` (no un cuadrado sólido).
+- [x] Comer una fruta incrementa `score` en 10 y `length` en 1, y genera una nueva fruta en una celda libre.
+- [x] El HUD React de la plataforma refleja en tiempo real `score` y `length`.
+- [x] El botón "PAUSA" congela el movimiento de la serpiente; "REANUDAR" lo reanuda.
+- [x] Chocar contra la propia cola termina la partida.
+- [x] Chocar contra el borde del tablero termina la partida (sin wrap-around).
+- [x] Al terminar la partida, aparece el modal React de game over con la puntuación final.
+- [x] El canvas no dibuja ningún overlay "GAME OVER" propio.
+- [x] El botón "JUGAR DE NUEVO" reinicia la partida desde cero (longitud 3, score 0).
+- [x] Al abrir el modal, el campo de nombre se pre-rellena con `av_player_name` de localStorage si existe.
+- [x] Al confirmar, el score se inserta en Supabase y el nombre se persiste en localStorage.
+- [x] El botón "GUARDAR PUNTUACIÓN" se deshabilita tras el primer envío (sin doble inserción).
+- [x] El score guardado aparece en `/games/snake` y en `/hall-of-fame` al recargar.
+- [x] Cuando no hay scores, el leaderboard muestra "Sé el primero en entrar al salón de la fama".
+- [x] `/hall-of-fame` muestra un tab para SNAKE.
+- [x] `npm run build` completa sin errores de TypeScript.
+- [x] Ninguna ruta existente devuelve 500.
 
 ---
 
