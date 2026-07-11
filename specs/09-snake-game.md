@@ -13,7 +13,8 @@
 
 - Insertar la fila `snake` en la tabla `games` de Supabase (seed manual vía SQL).
 - Copiar `references/source-assets/snake-assets/fruits.png` a `public/games/snake/fruits.png`. `sprites.js` se usa únicamente como referencia de coordenadas del atlas al escribir el componente (no se copia tal cual; sus coordenadas `{x, y, w, h}` se trasladan a una constante TypeScript dentro del componente).
-- Crear `components/games/SnakeGame.tsx` — componente React `"use client"` que encapsula el canvas y el game loop de Snake (grid 20×20, celdas de 30px, canvas 600×600). Acepta props `paused`, `onScoreChange`, `onLengthChange`, `onGameOver`.
+- Crear `components/games/SnakeGame.tsx` — componente React `"use client"` que encapsula el canvas y el game loop de Snake (grid 20×20, celdas de 40px, canvas 800×800 — resolución interna alta, escalado a contenedor vía CSS `width/height: 100%` igual que el resto de juegos, para que no se vea desproporcionado). Acepta props `paused`, `onScoreChange`, `onLengthChange`, `onGameOver`.
+- La cabeza de la serpiente se dibuja visualmente distinta del cuerpo: brillo neón (`shadowBlur`) y un par de ojos orientados según la dirección de movimiento actual. El cuerpo alterna dos tonos de verde para un efecto de "escamas".
 - Mecánica implementada desde cero (no hay `game.js` de referencia, solo el atlas de sprites):
   - Serpiente se mueve en un grid discreto, un paso por tick.
   - Controles: flechas y WASD; se ignora cualquier input que intente invertir 180° sobre la dirección actual.
@@ -91,7 +92,7 @@ No se introducen nuevas tablas ni tipos TypeScript — se reutilizan `GameRow` y
    carga sin 404 en `/games/snake/fruits.png`.
 
 3. **Crear `components/games/SnakeGame.tsx`** — componente `"use client"` que:
-   - Renderiza un `<canvas>` de 600 × 600 con grid interno de 20 × 20 celdas de 30px.
+   - Renderiza un `<canvas>` de 800 × 800 con grid interno de 20 × 20 celdas de 40px.
    - Implementa el game loop desde cero: la serpiente arranca con longitud 3 en el centro
      del grid, se mueve un paso por tick (velocidad fija, ej. 8 ticks/segundo) en la
      dirección actual.

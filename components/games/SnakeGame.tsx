@@ -3,10 +3,15 @@
 import { useEffect, useRef } from 'react';
 
 const GRID = 20;
-const CELL = 30;
+const CELL = 40;
 const W = GRID * CELL;
 const H = GRID * CELL;
 const TICK_MS = 1000 / 8;
+
+const BODY_SHADE_A = '#2fbf6a';
+const BODY_SHADE_B = '#249e56';
+const HEAD_COLOR = '#5dffab';
+const HEAD_GLOW = 'rgba(93, 255, 171, 0.85)';
 
 interface SnakeGameProps {
   paused: boolean;
@@ -188,14 +193,90 @@ export default function SnakeGame({
       }
     }
 
+    function drawBody(seg: Segment, index: number) {
+      ctx.fillStyle = index % 2 === 0 ? BODY_SHADE_A : BODY_SHADE_B;
+      ctx.beginPath();
+      ctx.roundRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2, 6);
+      ctx.fill();
+    }
+
+    function drawHead(seg: Segment) {
+      const px = seg.x * CELL;
+      const py = seg.y * CELL;
+
+      ctx.save();
+      ctx.shadowColor = HEAD_GLOW;
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = HEAD_COLOR;
+      ctx.beginPath();
+      ctx.roundRect(px + 1, py + 1, CELL - 2, CELL - 2, 10);
+      ctx.fill();
+      ctx.restore();
+
+      const cx = px + CELL / 2;
+      const cy = py + CELL / 2;
+      const forward = CELL * 0.26;
+      const side = CELL * 0.2;
+      const eyeR = CELL * 0.11;
+      const pupilR = eyeR * 0.55;
+      const pupilShift = eyeR * 0.35;
+
+      let eyes: { ex: number; ey: number }[];
+      switch (direction) {
+        case 'up':
+          eyes = [
+            { ex: cx - side, ey: cy - forward },
+            { ex: cx + side, ey: cy - forward },
+          ];
+          break;
+        case 'down':
+          eyes = [
+            { ex: cx - side, ey: cy + forward },
+            { ex: cx + side, ey: cy + forward },
+          ];
+          break;
+        case 'left':
+          eyes = [
+            { ex: cx - forward, ey: cy - side },
+            { ex: cx - forward, ey: cy + side },
+          ];
+          break;
+        case 'right':
+          eyes = [
+            { ex: cx + forward, ey: cy - side },
+            { ex: cx + forward, ey: cy + side },
+          ];
+          break;
+      }
+
+      const { dx, dy } = DIRECTION_DELTA[direction];
+      for (const { ex, ey } of eyes) {
+        ctx.fillStyle = '#f4fff8';
+        ctx.beginPath();
+        ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#04140a';
+        ctx.beginPath();
+        ctx.arc(
+          ex + dx * pupilShift,
+          ey + dy * pupilShift,
+          pupilR,
+          0,
+          Math.PI * 2,
+        );
+        ctx.fill();
+      }
+    }
+
     function draw() {
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, W, H);
 
-      ctx.fillStyle = '#3ddc3d';
-      for (const seg of snake) {
-        ctx.fillRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2);
+      for (let i = snake.length - 1; i >= 1; i--) {
+        drawBody(snake[i], i);
       }
+      if (snake.length > 0) drawHead(snake[0]);
 
       if (food && imageLoaded) {
         const frame = FRUIT_ATLAS[food.fruit];
