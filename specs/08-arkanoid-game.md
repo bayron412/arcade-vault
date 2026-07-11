@@ -1,6 +1,6 @@
 # SPEC 08 — Integración del juego Arkanoid
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 05 (Asteroids integración), SPEC 06 (leaderboard/scores)
 > **Fecha:** 2026-07-11
 > **Objetivo:** Integrar el juego Arkanoid (canvas puro, referencia `references/started-games/04-arkanoid/`) como nuevo juego jugable en la plataforma, con HUD, pausa y leaderboard conectado a Supabase.
@@ -117,28 +117,28 @@ se dispara `onGameOver(score)`.
 
 ## Acceptance criteria
 
-- [ ] La fila `arkanoid` existe en la tabla `games` de Supabase con los valores del data model.
-- [ ] La card de Arkanoid aparece en `/games` con cover `cover-bricks` y color `magenta`.
-- [ ] La ruta `/games/arkanoid/play` carga sin errores de SSR ni de TypeScript.
-- [ ] El canvas principal (800 × 600) se renderiza centrado.
-- [ ] La paleta se mueve con el mouse y también con `←`/`→`.
-- [ ] Los 5 niveles cargan en orden con velocidad creciente, igual que el original.
-- [ ] Romper un bloque suma 10 puntos y dispara la animación de explosión y el sonido.
-- [ ] Perder la bola resta una vida; al llegar a 0 vidas termina la partida.
-- [ ] Completar el nivel 5 (`gameState === 'win'`) también termina la partida.
-- [ ] El HUD interno del canvas (score, vidas, nivel) se dibuja correctamente durante la partida.
-- [ ] El HUD React de la plataforma refleja en tiempo real score, vidas y nivel.
-- [ ] El botón "PAUSA" de la plataforma congela `update(dt)`; "REANUDAR" lo reanuda.
-- [ ] La tecla `P`/`Esc` sigue abriendo la pausa secundaria del canvas (selector de nivel por clic), de forma independiente al botón de la plataforma.
-- [ ] Al producirse game over o win, `onLivesChange(0)` y `onGameOver(score)` se disparan; aparece el modal React de la plataforma con la puntuación final.
-- [ ] Los overlays HTML "GAME OVER" y "¡Completaste el juego!" del canvas original no se muestran.
-- [ ] El botón "JUGAR DE NUEVO" del modal reinicia la partida desde cero.
-- [ ] Al terminar una partida, el modal pre-rellena el nombre desde `av_player_name` si existe.
-- [ ] Al confirmar el nombre, el score se inserta en Supabase y el nombre se persiste en `localStorage`.
-- [ ] El botón de guardar se deshabilita tras el primer envío (sin doble inserción).
-- [ ] El score guardado aparece en `/games/arkanoid` (top 10) y en `/hall-of-fame` al recargar.
-- [ ] `npm run build` completa sin errores de TypeScript.
-- [ ] Ninguna ruta existente devuelve 500.
+- [x] La fila `arkanoid` existe en la tabla `games` de Supabase con los valores del data model.
+- [x] La card de Arkanoid aparece en `/games` con cover `cover-bricks` y color `magenta`.
+- [x] La ruta `/games/arkanoid/play` carga sin errores de SSR ni de TypeScript.
+- [x] El canvas principal (800 × 600) se renderiza centrado.
+- [x] La paleta se mueve con el mouse y también con `←`/`→`.
+- [x] Los 5 niveles cargan en orden con velocidad creciente, igual que el original.
+- [x] Romper un bloque suma 10 puntos y dispara la animación de explosión y el sonido.
+- [x] Perder la bola resta una vida; al llegar a 0 vidas termina la partida.
+- [x] Completar el nivel 5 (`gameState === 'win'`) también termina la partida.
+- [x] El HUD interno del canvas (score, vidas, nivel) se dibuja correctamente durante la partida.
+- [x] El HUD React de la plataforma refleja en tiempo real score, vidas y nivel.
+- [x] El botón "PAUSA" de la plataforma congela `update(dt)`; "REANUDAR" lo reanuda.
+- [x] La tecla `P`/`Esc` sigue abriendo la pausa secundaria del canvas (selector de nivel por clic), de forma independiente al botón de la plataforma.
+- [x] Al producirse game over o win, `onLivesChange(0)` y `onGameOver(score)` se disparan; aparece el modal React de la plataforma con la puntuación final.
+- [x] Los overlays HTML "GAME OVER" y "¡Completaste el juego!" del canvas original no se muestran.
+- [x] El botón "JUGAR DE NUEVO" del modal reinicia la partida desde cero.
+- [x] Al terminar una partida, el modal pre-rellena el nombre desde `av_player_name` si existe.
+- [x] Al confirmar el nombre, el score se inserta en Supabase y el nombre se persiste en `localStorage`.
+- [x] El botón de guardar se deshabilita tras el primer envío (sin doble inserción).
+- [x] El score guardado aparece en `/games/arkanoid` (top 10) y en `/hall-of-fame` al recargar.
+- [x] `npm run build` completa sin errores de TypeScript.
+- [x] Ninguna ruta existente devuelve 500.
 
 ---
 
