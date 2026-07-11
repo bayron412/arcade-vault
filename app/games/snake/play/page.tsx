@@ -212,6 +212,9 @@ export default function SnakePlayPage() {
               <button type="button" className="btn" onClick={restart}>
                 JUGAR DE NUEVO
               </button>
+              <Link href={`/games/${game.id}`} className="btn ghost">
+                VER PUNTUACIONES
+              </Link>
               <Link href="/games" className="btn magenta">
                 VOLVER AL VAULT
               </Link>
