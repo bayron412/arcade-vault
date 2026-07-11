@@ -121,27 +121,27 @@ El estado local del componente no introduce modelos persistentes. Las vidas arra
 
 ## Acceptance criteria
 
-- [ ] La fila `tetris` existe en la tabla `games` de Supabase con los valores del data model.
-- [ ] La card de Tetris aparece en `/games` con cover `cover-tetro` y color `cyan`.
-- [ ] La ruta `/games/tetris/play` carga sin errores de SSR ni de TypeScript.
-- [ ] El canvas principal (300 × 600) se renderiza centrado; el canvas de siguiente pieza
+- [x] La fila `tetris` existe en la tabla `games` de Supabase con los valores del data model.
+- [x] La card de Tetris aparece en `/games` con cover `cover-tetro` y color `cyan`.
+- [x] La ruta `/games/tetris/play` carga sin errores de SSR ni de TypeScript.
+- [x] El canvas principal (300 × 600) se renderiza centrado; el canvas de siguiente pieza
       (120 × 120) aparece desplazado a la derecha.
-- [ ] El juego es jugable con teclado (←/→ mover, ↑/X rotar, ↓ soft drop, Space hard drop).
-- [ ] El HUD interno del canvas (score, lines, level) se dibuja correctamente durante la partida.
-- [ ] El HUD React de la plataforma refleja en tiempo real score, vidas y nivel.
-- [ ] El botón "PAUSA" de la plataforma congela el game loop; "REANUDAR" lo reanuda.
-- [ ] Las teclas P / Esc no provocan una pausa independiente del canvas.
-- [ ] Al producirse game over, `onLivesChange(0)` y `onGameOver(score)` se disparan; aparece
+- [x] El juego es jugable con teclado (←/→ mover, ↑/X rotar, ↓ soft drop, Space hard drop).
+- [x] El HUD interno del canvas (score, lines, level) se dibuja correctamente durante la partida.
+- [x] El HUD React de la plataforma refleja en tiempo real score, vidas y nivel.
+- [x] El botón "PAUSA" de la plataforma congela el game loop; "REANUDAR" lo reanuda.
+- [x] Las teclas P / Esc no provocan una pausa independiente del canvas.
+- [x] Al producirse game over, `onLivesChange(0)` y `onGameOver(score)` se disparan; aparece
       el modal React de la plataforma con la puntuación final.
-- [ ] El overlay HTML "GAME OVER" del canvas original no se muestra.
-- [ ] El botón "JUGAR DE NUEVO" del modal reinicia la partida desde cero.
-- [ ] Al terminar una partida, el modal pre-rellena el nombre desde `av_player_name` si existe.
-- [ ] Al confirmar el nombre, el score se inserta en Supabase y el nombre se persiste en
+- [x] El overlay HTML "GAME OVER" del canvas original no se muestra.
+- [x] El botón "JUGAR DE NUEVO" del modal reinicia la partida desde cero.
+- [x] Al terminar una partida, el modal pre-rellena el nombre desde `av_player_name` si existe.
+- [x] Al confirmar el nombre, el score se inserta en Supabase y el nombre se persiste en
       `localStorage`.
-- [ ] El botón de guardar se deshabilita tras el primer envío (sin doble inserción).
-- [ ] El score guardado aparece en `/games/tetris` y en `/hall-of-fame` al recargar.
-- [ ] `npm run build` completa sin errores de TypeScript.
-- [ ] Ninguna ruta existente devuelve 500.
+- [x] El botón de guardar se deshabilita tras el primer envío (sin doble inserción).
+- [x] El score guardado aparece en `/games/tetris` y en `/hall-of-fame` al recargar.
+- [x] `npm run build` completa sin errores de TypeScript.
+- [x] Ninguna ruta existente devuelve 500.
 
 ---
 

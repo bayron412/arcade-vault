@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 const COLS = 10;
 const ROWS = 20;
 const BLOCK = 30;
-const NEXT_BLOCK = 25;
-const ASIDE_WIDTH = 120;
+const NEXT_BLOCK = 30;
+const ASIDE_WIDTH = 130;
 const LAYOUT_GAP = 16;
 const LAYOUT_PADDING_X = 24;
 const LAYOUT_PADDING_Y = 16;
@@ -697,8 +697,8 @@ export default function TetrisGame({
             </span>
             <canvas
               ref={nextCanvasRef}
-              width={100}
-              height={100}
+              width={120}
+              height={120}
               style={{
                 display: 'block',
                 border: `1px solid ${currentSkin.border}`,
