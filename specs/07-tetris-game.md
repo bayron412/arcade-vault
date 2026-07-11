@@ -1,6 +1,6 @@
 # SPEC 07 — Integración del juego Tetris
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** 06-leaderboard-scores
 > **Fecha:** 2026-05-18
 > **Objetivo:** Integrar el juego Tetris (canvas puro) como nuevo juego jugable en la

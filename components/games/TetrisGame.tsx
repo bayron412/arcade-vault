@@ -5,7 +5,14 @@ import { useEffect, useRef, useState } from 'react';
 const COLS = 10;
 const ROWS = 20;
 const BLOCK = 30;
-const NEXT_BLOCK = 30;
+const NEXT_BLOCK = 25;
+const ASIDE_WIDTH = 120;
+const LAYOUT_GAP = 16;
+const LAYOUT_PADDING_X = 24;
+const LAYOUT_PADDING_Y = 16;
+const NATURAL_WIDTH =
+  COLS * BLOCK + LAYOUT_GAP + ASIDE_WIDTH + LAYOUT_PADDING_X;
+const NATURAL_HEIGHT = ROWS * BLOCK + LAYOUT_PADDING_Y;
 
 interface TetrisGameProps {
   paused: boolean;
@@ -45,7 +52,6 @@ const SKINS: Record<SkinId, Skin> = {
       '#e84d3d',
       '#3d6fe8',
       '#e8a13d',
-      '#a0a0a0',
     ],
     highlight: 'rgba(255,255,255,0.18)',
     panelLabel: '#3ddc3d',
@@ -66,7 +72,6 @@ const SKINS: Record<SkinId, Skin> = {
       '#ff3b3b',
       '#7a5cff',
       '#ff9d1f',
-      '#9e9e9e',
     ],
     highlight: 'rgba(255,255,255,0.25)',
     panelLabel: '#ff2bd6',
@@ -87,7 +92,6 @@ const SKINS: Record<SkinId, Skin> = {
       '#f4b8bd',
       '#b8c8f4',
       '#f4d3a8',
-      '#cfcfcf',
     ],
     highlight: 'rgba(255,255,255,0.5)',
     panelLabel: '#8a6bb0',
@@ -108,7 +112,6 @@ const SKINS: Record<SkinId, Skin> = {
       '#ff453a',
       '#0a84ff',
       '#ff9f0a',
-      '#8e8e93',
     ],
     highlight: 'rgba(0,0,0,0.35)',
     panelLabel: '#ffffff',
@@ -156,11 +159,6 @@ const PIECES: (number[][] | null)[] = [
     [7, 7, 7],
     [0, 0, 0],
   ], // L
-  // [
-  //   [8, 8, 8],
-  //   [8, 0, 8],
-  //   [8, 8, 8],
-  // ], // N (tuerca)
 ];
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
@@ -184,12 +182,32 @@ export default function TetrisGame({
   const scoreElRef = useRef<HTMLSpanElement>(null);
   const linesElRef = useRef<HTMLSpanElement>(null);
   const levelElRef = useRef<HTMLSpanElement>(null);
+  const outerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
 
   const [skin, setSkin] = useState<SkinId>(() => {
     const stored = localStorage.getItem(SKIN_STORAGE_KEY) as SkinId | null;
     return stored && SKINS[stored] ? stored : 'retro';
   });
   const skinRef = useRef<Skin>(SKINS[skin]);
+
+  useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+
+    const recompute = () => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      setScale(
+        Math.min(rect.width / NATURAL_WIDTH, rect.height / NATURAL_HEIGHT),
+      );
+    };
+
+    recompute();
+    const ro = new ResizeObserver(recompute);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const pausedRef = useRef(paused);
   const callbacksRef = useRef({
@@ -252,7 +270,7 @@ export default function TetrisGame({
     }
 
     function randomPiece(): Piece {
-      const type = Math.floor(Math.random() * 8) + 1;
+      const type = Math.floor(Math.random() * 7) + 1;
       const shape = PIECES[type]!.map((row) => [...row]);
       return {
         type,
@@ -497,7 +515,16 @@ export default function TetrisGame({
       animId = requestAnimationFrame(loop);
     }
 
+    const GAME_KEYS = new Set([
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Space',
+    ]);
+
     function handleKeyDown(e: KeyboardEvent) {
+      if (GAME_KEYS.has(e.code)) e.preventDefault();
       if (e.code === 'KeyP' || e.code === 'Escape') return;
       if (pausedRef.current || gameOver) return;
       switch (e.code) {
@@ -515,7 +542,6 @@ export default function TetrisGame({
           tryRotate();
           break;
         case 'Space':
-          e.preventDefault();
           hardDrop();
           break;
       }
@@ -537,167 +563,187 @@ export default function TetrisGame({
 
   return (
     <div
+      ref={outerRef}
       style={{
+        width: '100%',
+        height: '100%',
         display: 'flex',
-        gap: 20,
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'center',
-        padding: '4px 12px',
-        fontFamily: "'Courier New', Courier, monospace",
+        overflow: 'hidden',
       }}
     >
-      <canvas
-        ref={boardCanvasRef}
-        width={COLS * BLOCK}
-        height={ROWS * BLOCK}
+      <div
         style={{
-          display: 'block',
-          border: `1px solid ${currentSkin.border}`,
-          background: currentSkin.boardBg,
-          borderRadius: 4,
-        }}
-      />
-
-      <aside
-        style={{
-          width: 150,
           display: 'flex',
-          flexDirection: 'column',
-          gap: 18,
-          paddingTop: 18,
+          gap: LAYOUT_GAP,
+          alignItems: 'stretch',
+          justifyContent: 'center',
+          width: NATURAL_WIDTH,
+          height: NATURAL_HEIGHT,
+          flexShrink: 0,
+          boxSizing: 'border-box',
+          padding: `${LAYOUT_PADDING_Y / 2}px ${LAYOUT_PADDING_X / 2}px`,
+          fontFamily: "'Courier New', Courier, monospace",
+          transform: `scale(${scale})`,
+          transformOrigin: 'center center',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span
-            style={{
-              fontSize: 10,
-              letterSpacing: 2,
-              color: currentSkin.panelLabel,
-              fontWeight: 600,
-            }}
-          >
-            SCORE
-          </span>
-          <span
-            ref={scoreElRef}
-            style={{
-              fontSize: 24,
-              fontWeight: 700,
-              color: currentSkin.panelValue,
-              letterSpacing: 1,
-            }}
-          >
-            0
-          </span>
-        </div>
+        <canvas
+          ref={boardCanvasRef}
+          width={COLS * BLOCK}
+          height={ROWS * BLOCK}
+          style={{
+            display: 'block',
+            border: `1px solid ${currentSkin.border}`,
+            background: currentSkin.boardBg,
+            borderRadius: 4,
+          }}
+        />
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span
-            style={{
-              fontSize: 10,
-              letterSpacing: 2,
-              color: currentSkin.panelLabel,
-              fontWeight: 600,
-            }}
-          >
-            LINES
-          </span>
-          <span
-            ref={linesElRef}
-            style={{
-              fontSize: 24,
-              fontWeight: 700,
-              color: currentSkin.panelValue,
-              letterSpacing: 1,
-            }}
-          >
-            0
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span
-            style={{
-              fontSize: 10,
-              letterSpacing: 2,
-              color: currentSkin.panelLabel,
-              fontWeight: 600,
-            }}
-          >
-            LEVEL
-          </span>
-          <span
-            ref={levelElRef}
-            style={{
-              fontSize: 24,
-              fontWeight: 700,
-              color: currentSkin.panelValue,
-              letterSpacing: 1,
-            }}
-          >
-            1
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span
-            style={{
-              fontSize: 10,
-              letterSpacing: 2,
-              color: currentSkin.panelLabel,
-              fontWeight: 600,
-            }}
-          >
-            NEXT
-          </span>
-          <canvas
-            ref={nextCanvasRef}
-            width={120}
-            height={120}
-            style={{
-              display: 'block',
-              border: `1px solid ${currentSkin.border}`,
-              background: currentSkin.boardBg,
-              borderRadius: 4,
-            }}
-          />
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span
-            style={{
-              fontSize: 10,
-              letterSpacing: 2,
-              color: currentSkin.panelLabel,
-              fontWeight: 600,
-            }}
-          >
-            SKIN
-          </span>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-            {SKIN_ORDER.map((id) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => changeSkin(id)}
-                style={{
-                  fontFamily: 'inherit',
-                  fontSize: 9,
-                  letterSpacing: 1,
-                  padding: '4px 6px',
-                  borderRadius: 3,
-                  cursor: 'pointer',
-                  color: skin === id ? SKINS[id].boardBg : SKINS[id].accent,
-                  background: skin === id ? SKINS[id].accent : 'transparent',
-                  border: `1px solid ${SKINS[id].accent}`,
-                }}
-              >
-                {SKINS[id].label}
-              </button>
-            ))}
+        <aside
+          style={{
+            width: ASIDE_WIDTH,
+            flexShrink: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+            paddingTop: 8,
+            overflow: 'hidden',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span
+              style={{
+                fontSize: 10,
+                letterSpacing: 2,
+                color: currentSkin.panelLabel,
+                fontWeight: 600,
+              }}
+            >
+              SCORE
+            </span>
+            <span
+              ref={scoreElRef}
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: currentSkin.panelValue,
+                letterSpacing: 1,
+              }}
+            >
+              0
+            </span>
           </div>
-        </div>
-      </aside>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span
+              style={{
+                fontSize: 10,
+                letterSpacing: 2,
+                color: currentSkin.panelLabel,
+                fontWeight: 600,
+              }}
+            >
+              LINES
+            </span>
+            <span
+              ref={linesElRef}
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: currentSkin.panelValue,
+                letterSpacing: 1,
+              }}
+            >
+              0
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span
+              style={{
+                fontSize: 10,
+                letterSpacing: 2,
+                color: currentSkin.panelLabel,
+                fontWeight: 600,
+              }}
+            >
+              LEVEL
+            </span>
+            <span
+              ref={levelElRef}
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: currentSkin.panelValue,
+                letterSpacing: 1,
+              }}
+            >
+              1
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span
+              style={{
+                fontSize: 10,
+                letterSpacing: 2,
+                color: currentSkin.panelLabel,
+                fontWeight: 600,
+              }}
+            >
+              NEXT
+            </span>
+            <canvas
+              ref={nextCanvasRef}
+              width={100}
+              height={100}
+              style={{
+                display: 'block',
+                border: `1px solid ${currentSkin.border}`,
+                background: currentSkin.boardBg,
+                borderRadius: 4,
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span
+              style={{
+                fontSize: 10,
+                letterSpacing: 2,
+                color: currentSkin.panelLabel,
+                fontWeight: 600,
+              }}
+            >
+              SKIN
+            </span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+              {SKIN_ORDER.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => changeSkin(id)}
+                  style={{
+                    fontFamily: 'inherit',
+                    fontSize: 9,
+                    letterSpacing: 1,
+                    padding: '4px 6px',
+                    borderRadius: 3,
+                    cursor: 'pointer',
+                    color: skin === id ? SKINS[id].boardBg : SKINS[id].accent,
+                    background: skin === id ? SKINS[id].accent : 'transparent',
+                    border: `1px solid ${SKINS[id].accent}`,
+                  }}
+                >
+                  {SKINS[id].label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

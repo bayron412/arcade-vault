@@ -13,6 +13,12 @@ const TetrisGame = dynamic(() => import('@/components/games/TetrisGame'), {
 
 const game = { id: 'tetris', title: 'TETRIS' };
 
+// TetrisGame renders a 300×600 board + a 120px side panel (16px gap, 24×16px
+// wrapper padding) — much taller than the 4:3 ratio the shared `.crt-screen`
+// box assumes for other games, so it needs its own aspect ratio to avoid the
+// canvas being clipped by `overflow: hidden`.
+const TETRIS_ASPECT = (300 + 16 + 120 + 24) / (600 + 16);
+
 export default function TetrisPlayPage() {
   const router = useRouter();
   const { user } = useUser();
@@ -48,7 +54,7 @@ export default function TetrisPlayPage() {
         (crtBottomRef.current?.offsetHeight ?? 24) + 14 + 24 + 24;
       const availableHeight = window.innerHeight - top - bottomReserved;
 
-      const widthFromHeight = Math.max(200, availableHeight * (4 / 3));
+      const widthFromHeight = Math.max(200, availableHeight * TETRIS_ASPECT);
       setScreenWidth(Math.max(200, Math.min(availableWidth, widthFromHeight)));
     };
 
@@ -139,9 +145,12 @@ export default function TetrisPlayPage() {
         <div
           ref={crtScreenRef}
           className="crt-screen"
-          style={
-            screenWidth ? { width: screenWidth, margin: '0 auto' } : undefined
-          }
+          style={{
+            aspectRatio: TETRIS_ASPECT,
+            ...(screenWidth
+              ? { width: screenWidth, margin: '0 auto' }
+              : undefined),
+          }}
         >
           <TetrisGame
             key={gameKey}
