@@ -25,10 +25,7 @@ Usa siempre `/frontend-design` para diseñar la interfaz de usuario.
 
 ## Agentes
 
-- **`game-planner`** (`.claude/agents/game-planner.md`) — planifica y sugiere el próximo juego a implementar. Lee el catálogo actual, evalúa candidatos por diversidad de género, factibilidad en canvas 2D y reconocimiento clásico, y mantiene una memoria persistente de sugerencias en `references/game-suggestions-todo.md`. Úsalo cuando el usuario pregunte qué juego sigue o pida ideas.
-- **`game-jam`** (`.claude/agents/game-jam.md`) — dado un tema en lenguaje natural, elige un juego arcade y genera al menos dos specs completos en `specs/game-jam/<game-id>/` siguiendo el formato de los specs 07-09. Úsalo con "game jam: <tema>" o "specs para un juego de <tema>".
-- **`skin-designer`** (`.claude/agents/skin-designer.md`) — aplica los 3 skins canónicos (classic, retro, neon) al juego indicado por el usuario. Trabaja un juego por corrida. Implementa directamente sobre `components/games/<Juego>.tsx` siguiendo el patrón de TetrisGame. Memoria en `references/game-with-themes.md`. Úsalo con "aplica skins a \<juego\>".
-- **`mobile-porter`** (`.claude/agents/mobile-porter.md`) — aplica el patrón de controles táctiles mobile (spec 10) a un juego concreto: oculta el HUD en `<md`, escala el canvas, y cabla `<MobileGamepad>` en la play-page sin tocar el componente canvas. Trabaja un juego por corrida. Úsalo con "porta \<juego\> a mobile", "añade controles táctiles a \<juego\>" o "haz \<juego\> responsive".
+- **`game-planner`** (`.claude/agents/game-planner.md`) — planifica y sugiere el próximo juego a implementar. Lee el catálogo actual (`references/implemented-games.md`), evalúa candidatos por diversidad de género, factibilidad en canvas 2D y reconocimiento clásico, y mantiene una memoria persistente de sugerencias en `references/game-suggestions-todo.md`. Úsalo cuando el usuario pregunte qué juego sigue o pida ideas.
 
 ## Architecture
 
