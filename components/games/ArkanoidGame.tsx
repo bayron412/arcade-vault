@@ -15,11 +15,68 @@ const H = 600;
 
 interface ArkanoidGameProps {
   paused: boolean;
+  skin: SkinId;
   onScoreChange: (score: number) => void;
   onLivesChange: (lives: number) => void;
   onLevelChange: (level: number) => void;
   onGameOver: (finalScore: number) => void;
 }
+
+export type SkinId = 'classic' | 'retro' | 'neon' | 'pixel';
+
+interface Skin {
+  label: string;
+  bg: string;
+  hudText: string;
+  accent: string;
+  pauseOverlay: string;
+  pauseText: string;
+  spriteFilter: string;
+}
+
+export const SKINS: Record<SkinId, Skin> = {
+  classic: {
+    label: 'CLASSIC',
+    bg: '#000000',
+    hudText: '#ffffff',
+    accent: '#f0c040',
+    pauseOverlay: 'rgba(0, 0, 0, 0.65)',
+    pauseText: '#ffffff',
+    spriteFilter: 'none',
+  },
+  retro: {
+    label: 'RETRO',
+    bg: '#0d1b0d',
+    hudText: '#3ddc3d',
+    accent: '#3ddc3d',
+    pauseOverlay: 'rgba(4, 20, 4, 0.75)',
+    pauseText: '#3ddc3d',
+    spriteFilter:
+      'sepia(1) hue-rotate(70deg) saturate(3.5) brightness(0.9) contrast(1.1)',
+  },
+  neon: {
+    label: 'NEON',
+    bg: '#05010f',
+    hudText: '#00f0ff',
+    accent: '#ff2bd6',
+    pauseOverlay: 'rgba(5, 1, 15, 0.75)',
+    pauseText: '#ff2bd6',
+    spriteFilter:
+      'saturate(2.4) brightness(1.2) contrast(1.15) hue-rotate(-8deg)',
+  },
+  pixel: {
+    label: 'PIXEL ART',
+    bg: '#000000',
+    hudText: '#ffffff',
+    accent: '#ffd400',
+    pauseOverlay: 'rgba(0, 0, 0, 0.8)',
+    pauseText: '#ffffff',
+    spriteFilter: 'contrast(2) saturate(1.6) brightness(1.05)',
+  },
+};
+
+export const SKIN_ORDER: SkinId[] = ['classic', 'retro', 'neon', 'pixel'];
+export const SKIN_STORAGE_KEY = 'av-arkanoid-skin';
 
 type GameState = 'playing' | 'gameover' | 'win';
 
@@ -116,6 +173,7 @@ const LEVELS: Level[] = (() => {
 
 export default function ArkanoidGame({
   paused,
+  skin,
   onScoreChange,
   onLivesChange,
   onLevelChange,
@@ -123,6 +181,7 @@ export default function ArkanoidGame({
 }: ArkanoidGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
+  const skinRef = useRef<Skin>(SKINS[skin]);
   const callbacksRef = useRef({
     onScoreChange,
     onLivesChange,
@@ -133,6 +192,10 @@ export default function ArkanoidGame({
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
+
+  useEffect(() => {
+    skinRef.current = SKINS[skin];
+  }, [skin]);
 
   useEffect(() => {
     callbacksRef.current = {
@@ -386,10 +449,11 @@ export default function ArkanoidGame({
 
     // ── Draw ──────────────────────────────────────────────────────────────
     function drawPauseOverlay() {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+      const skin = skinRef.current;
+      ctx.fillStyle = skin.pauseOverlay;
       ctx.fillRect(0, 0, W, H);
 
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = skin.pauseText;
       ctx.font = 'bold 56px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -401,8 +465,8 @@ export default function ArkanoidGame({
       for (let i = 0; i < 5; i++) {
         const bx = PAUSE_BTN_ROW_X + i * (PAUSE_BTN_W + PAUSE_BTN_GAP);
         const isActive = i + 1 === currentLevel;
-        ctx.fillStyle = isActive ? '#f0c040' : '#444';
-        ctx.strokeStyle = '#fff';
+        ctx.fillStyle = isActive ? skin.accent : '#444';
+        ctx.strokeStyle = skin.pauseText;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.roundRect(bx, PAUSE_BTN_Y, PAUSE_BTN_W, PAUSE_BTN_H, 6);
@@ -421,8 +485,12 @@ export default function ArkanoidGame({
     }
 
     function draw() {
-      ctx.fillStyle = '#000';
+      const skin = skinRef.current;
+      ctx.fillStyle = skin.bg;
       ctx.fillRect(0, 0, W, H);
+
+      ctx.save();
+      ctx.filter = skin.spriteFilter;
 
       for (const block of blocks) {
         if (block.alive)
@@ -455,19 +523,24 @@ export default function ArkanoidGame({
       drawSprite(ctx, 'ball', ball.x, ball.y, ball.w, ball.h);
 
       if (gameState === 'playing') {
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 18px monospace';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillText('Score: ' + score, 10, 10);
-        ctx.textAlign = 'center';
-        ctx.fillText('Nivel: ' + currentLevel, W / 2, 10);
         const ballSize = 16;
         const ballSpacing = 4;
         for (let i = 0; i < lives; i++) {
           const bx = W - 10 - (lives - i) * (ballSize + ballSpacing);
           drawSprite(ctx, 'ball', bx, 10, ballSize, ballSize);
         }
+      }
+
+      ctx.restore();
+
+      if (gameState === 'playing') {
+        ctx.fillStyle = skin.hudText;
+        ctx.font = 'bold 18px monospace';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('Score: ' + score, 10, 10);
+        ctx.textAlign = 'center';
+        ctx.fillText('Nivel: ' + currentLevel, W / 2, 10);
       }
 
       if (isPaused) drawPauseOverlay();
