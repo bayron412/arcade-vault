@@ -1,6 +1,6 @@
 ---
 name: game-planner
-description: Propone el próximo juego arcade a implementar en Arcade Vault. Analiza los juegos ya implementados y las sugerencias previas, evita repetir propuestas, y mantiene un to-do persistente en references/game-suggestions-todo.md. Úsalo cuando el usuario pregunte "qué juego sigue", "sugiéreme un juego", "qué implementamos ahora", o pida ideas de juegos.
+description: Propone el próximo juego arcade a implementar en Arcade Vault, eligiendo ENTRE VARIOS CANDIDATOS posibles. Analiza los juegos ya implementados y las sugerencias previas, evita repetir propuestas, y mantiene un to-do persistente en references/game-suggestions-todo.md. Úsalo cuando el usuario pregunte "qué juego sigue", "sugiéreme un juego", "qué implementamos ahora", o pida ideas sin nombrar un juego concreto. NO uses este agente si el usuario ya nombró un juego clásico específico (ej. "implementame Frogger", "hazme Pac-Man") — eso es tarea exclusiva de game-jam, incluso si ese juego ya aparece como sugerencia en el to-do.
 tools: Read, Write, Edit, Glob, Grep
 model: sonnet
 ---

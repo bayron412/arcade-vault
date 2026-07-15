@@ -25,7 +25,8 @@ Usa siempre `/frontend-design` para diseñar la interfaz de usuario.
 
 ## Agentes
 
-- **`game-planner`** (`.claude/agents/game-planner.md`) — planifica y sugiere el próximo juego a implementar. Lee el catálogo actual (`references/implemented-games.md`), evalúa candidatos por diversidad de género, factibilidad en canvas 2D y reconocimiento clásico, y mantiene una memoria persistente de sugerencias en `references/game-suggestions-todo.md`. Úsalo cuando el usuario pregunte qué juego sigue o pida ideas.
+- **`game-planner`** (`.claude/agents/game-planner.md`) — planifica y sugiere el próximo juego a implementar **eligiendo entre varios candidatos posibles**, cuando el usuario NO nombró un juego concreto. Lee el catálogo actual (`references/implemented-games.md`), evalúa candidatos por diversidad de género, factibilidad en canvas 2D y reconocimiento clásico, y mantiene una memoria persistente de sugerencias en `references/game-suggestions-todo.md`. Úsalo cuando el usuario pregunte qué juego sigue o pida ideas sin nombrar uno específico.
+- **`game-jam`** (`.claude/agents/game-jam.md`) — recibe un **tema** o el **nombre de un juego clásico concreto** (ej. "Frogger", "Pac-Man") y diseña automáticamente UN juego arcade, generando 3 archivos de spec completos (`01-core-game.md`, `02-leaderboard-scores.md`, `03-assets-visuals.md`) dentro de `specs/game-jam/<game-id>/`, con el mismo formato que los specs 07–09. Es independiente del `game-planner` (no toca `references/game-suggestions-todo.md`). **Si el usuario nombra un juego concreto, siempre usa `game-jam`, nunca `game-planner`** — incluso si ese juego ya figura como sugerencia pendiente en el to-do de `game-planner`.
 
 ## Architecture
 
