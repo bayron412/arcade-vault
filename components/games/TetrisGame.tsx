@@ -16,13 +16,14 @@ const NATURAL_HEIGHT = ROWS * BLOCK + LAYOUT_PADDING_Y;
 
 interface TetrisGameProps {
   paused: boolean;
+  skin: SkinId;
   onScoreChange: (score: number) => void;
   onLivesChange: (lives: number) => void;
   onLevelChange: (level: number) => void;
   onGameOver: (finalScore: number) => void;
 }
 
-type SkinId = 'retro' | 'neon' | 'pastel' | 'pixel';
+export type SkinId = 'retro' | 'neon' | 'pastel' | 'pixel';
 
 interface Skin {
   label: string;
@@ -36,7 +37,7 @@ interface Skin {
   panelValue: string;
 }
 
-const SKINS: Record<SkinId, Skin> = {
+export const SKINS: Record<SkinId, Skin> = {
   retro: {
     label: 'RETRO',
     boardBg: '#0d1b0d',
@@ -119,8 +120,8 @@ const SKINS: Record<SkinId, Skin> = {
   },
 };
 
-const SKIN_ORDER: SkinId[] = ['retro', 'neon', 'pastel', 'pixel'];
-const SKIN_STORAGE_KEY = 'av-tetris-skin';
+export const SKIN_ORDER: SkinId[] = ['retro', 'neon', 'pastel', 'pixel'];
+export const SKIN_STORAGE_KEY = 'av-tetris-skin';
 
 const PIECES: (number[][] | null)[] = [
   null,
@@ -172,6 +173,7 @@ interface Piece {
 
 export default function TetrisGame({
   paused,
+  skin,
   onScoreChange,
   onLivesChange,
   onLevelChange,
@@ -185,10 +187,6 @@ export default function TetrisGame({
   const outerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
-  const [skin, setSkin] = useState<SkinId>(() => {
-    const stored = localStorage.getItem(SKIN_STORAGE_KEY) as SkinId | null;
-    return stored && SKINS[stored] ? stored : 'retro';
-  });
   const skinRef = useRef<Skin>(SKINS[skin]);
 
   useEffect(() => {
@@ -233,11 +231,6 @@ export default function TetrisGame({
       onGameOver,
     };
   }, [onScoreChange, onLivesChange, onLevelChange, onGameOver]);
-
-  const changeSkin = (id: SkinId) => {
-    setSkin(id);
-    localStorage.setItem(SKIN_STORAGE_KEY, id);
-  };
 
   useEffect(() => {
     const canvas = boardCanvasRef.current;
@@ -706,41 +699,6 @@ export default function TetrisGame({
                 borderRadius: 4,
               }}
             />
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <span
-              style={{
-                fontSize: 10,
-                letterSpacing: 2,
-                color: currentSkin.panelLabel,
-                fontWeight: 600,
-              }}
-            >
-              SKIN
-            </span>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-              {SKIN_ORDER.map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => changeSkin(id)}
-                  style={{
-                    fontFamily: 'inherit',
-                    fontSize: 9,
-                    letterSpacing: 1,
-                    padding: '4px 6px',
-                    borderRadius: 3,
-                    cursor: 'pointer',
-                    color: skin === id ? SKINS[id].boardBg : SKINS[id].accent,
-                    background: skin === id ? SKINS[id].accent : 'transparent',
-                    border: `1px solid ${SKINS[id].accent}`,
-                  }}
-                >
-                  {SKINS[id].label}
-                </button>
-              ))}
-            </div>
           </div>
         </aside>
       </div>
