@@ -6,6 +6,12 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/app/context/UserContext';
+import {
+  SKINS,
+  SKIN_ORDER,
+  SKIN_STORAGE_KEY,
+  type SkinId,
+} from '@/components/games/TetrisGame';
 
 const TetrisGame = dynamic(() => import('@/components/games/TetrisGame'), {
   ssr: false,
@@ -31,6 +37,7 @@ export default function TetrisPlayPage() {
   const [name, setName] = useState(user ?? 'INVITADO');
   const [saved, setSaved] = useState(false);
   const [gameKey, setGameKey] = useState(0);
+  const [skin, setSkin] = useState<SkinId>('retro');
 
   const crtScreenRef = useRef<HTMLDivElement>(null);
   const crtBottomRef = useRef<HTMLDivElement>(null);
@@ -77,6 +84,16 @@ export default function TetrisPlayPage() {
     if (stored) setName(stored);
   }, [over]);
 
+  useEffect(() => {
+    const stored = localStorage.getItem(SKIN_STORAGE_KEY) as SkinId | null;
+    if (stored && SKINS[stored]) setSkin(stored);
+  }, []);
+
+  const changeSkin = (id: SkinId) => {
+    setSkin(id);
+    localStorage.setItem(SKIN_STORAGE_KEY, id);
+  };
+
   const saveScore = async () => {
     localStorage.setItem('av_player_name', name);
     setSaved(true);
@@ -122,6 +139,31 @@ export default function TetrisPlayPage() {
             <div className="l">Nivel</div>
             <div className="v">{String(level).padStart(2, '0')}</div>
           </div>
+          <div className="hud-stat">
+            <div className="l">Skin</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+              {SKIN_ORDER.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => changeSkin(id)}
+                  style={{
+                    fontFamily: 'var(--mono)',
+                    fontSize: 9,
+                    letterSpacing: '0.08em',
+                    padding: '4px 7px',
+                    borderRadius: 3,
+                    cursor: 'pointer',
+                    color: skin === id ? SKINS[id].boardBg : SKINS[id].accent,
+                    background: skin === id ? SKINS[id].accent : 'transparent',
+                    border: `1px solid ${SKINS[id].accent}`,
+                  }}
+                >
+                  {SKINS[id].label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         <div className="hud-actions">
           <button
@@ -155,6 +197,7 @@ export default function TetrisPlayPage() {
           <TetrisGame
             key={gameKey}
             paused={paused}
+            skin={skin}
             onScoreChange={setScore}
             onLivesChange={setLives}
             onLevelChange={setLevel}
