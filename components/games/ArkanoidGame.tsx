@@ -489,8 +489,7 @@ export default function ArkanoidGame({
       ctx.fillStyle = skin.bg;
       ctx.fillRect(0, 0, W, H);
 
-      ctx.save();
-      ctx.filter = skin.spriteFilter;
+      const filter = skin.spriteFilter;
 
       for (const block of blocks) {
         if (block.alive)
@@ -501,6 +500,7 @@ export default function ArkanoidGame({
             block.y,
             block.w,
             block.h,
+            filter,
           );
       }
 
@@ -516,22 +516,21 @@ export default function ArkanoidGame({
           exp.y,
           exp.w,
           exp.h,
+          filter,
         );
       }
 
-      drawSprite(ctx, 'paddle', paddle.x, paddle.y, paddle.w, paddle.h);
-      drawSprite(ctx, 'ball', ball.x, ball.y, ball.w, ball.h);
+      drawSprite(ctx, 'paddle', paddle.x, paddle.y, paddle.w, paddle.h, filter);
+      drawSprite(ctx, 'ball', ball.x, ball.y, ball.w, ball.h, filter);
 
       if (gameState === 'playing') {
         const ballSize = 16;
         const ballSpacing = 4;
         for (let i = 0; i < lives; i++) {
           const bx = W - 10 - (lives - i) * (ballSize + ballSpacing);
-          drawSprite(ctx, 'ball', bx, 10, ballSize, ballSize);
+          drawSprite(ctx, 'ball', bx, 10, ballSize, ballSize, filter);
         }
       }
-
-      ctx.restore();
 
       if (gameState === 'playing') {
         ctx.fillStyle = skin.hudText;

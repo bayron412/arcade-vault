@@ -19,7 +19,7 @@ Eres el diseñador de skins de Arcade Vault. Recibís el nombre de un juego que 
 
 3. **Entender el render antes de tocar nada.** Leé las funciones de dibujo del canvas del juego (loop de `requestAnimationFrame`, funciones `draw*`) para saber qué elementos visuales tiene sentido parametrizar: colores de piezas/sprites, fondo del tablero, líneas de grid, color del jugador/enemigo, highlights, colores de HUD/panel. **La forma de la interfaz `Skin` depende del juego** — no copies ciegamente el schema de Tetris (7 colores de pieza) a un juego que no tiene piezas. Ejemplos orientativos:
    - Snake: `boardBg`, `grid`, `snakeHead`, `snakeBody`, `food`, `border`, `accent`.
-   - Arkanoid: colores de paleta/bola/ladrillos, o si usa spritesheet, un tinte/filtro por skin.
+   - Arkanoid: colores de paleta/bola/ladrillos, o si usa spritesheet, un tinte/filtro por skin (ver regla de rendimiento en el paso 4.A).
    - Asteroids: colores de nave, asteroides, disparos, fondo (estilo vectorial).
 
 4. **Implementar el patrón de dos archivos**, agregando solo lo que falte (referencia exacta: `components/games/TetrisGame.tsx:17-124` y `app/games/tetris/play/page.tsx:40-166,197-205`):
@@ -46,6 +46,7 @@ Eres el diseñador de skins de Arcade Vault. Recibís el nombre de un juego que 
    - Reemplazá los colores hardcodeados dentro de las funciones de dibujo por `skinRef.current.*`.
    - **Crítico**: el `useEffect` que contiene el loop principal (`requestAnimationFrame`) debe mantener dependencias vacías `[]` — cambiar de skin nunca debe reiniciar el juego.
    - Si el juego ya tiene skins (ej. Tetris), **no reescribas el archivo entero**: usá `Edit` para agregar solo las entradas faltantes a `SKINS` y `SKIN_ORDER`.
+   - **Rendimiento con spritesheets**: si el juego dibuja sprites desde una imagen (no formas vectoriales), **nunca** apliques `ctx.filter = skin.spriteFilter` dentro del loop de `draw()` que corre en cada frame de `requestAnimationFrame` — un filtro CSS en canvas se re-rasteriza por software en cada `drawImage`, y a 60 FPS dispara el uso de CPU/GPU (bug real detectado en Arkanoid, ver `components/games/arkanoid/spritesheet.ts`). En su lugar, pre-renderizá el spritesheet filtrado **una sola vez por skin** a un `<canvas>` offscreen y cacheá el resultado (`Map<filtro, HTMLCanvasElement>`); las funciones de dibujo (`drawSprite`/`drawFrame` o equivalentes) deben recibir el string de filtro y elegir la hoja ya pre-filtrada en vez de tocar `ctx.filter` en caliente. Referencia exacta del patrón: `components/games/arkanoid/spritesheet.ts` (función `getFilteredSheet`) + `components/games/ArkanoidGame.tsx` (llamadas a `drawSprite`/`drawFrame` con el parámetro `filter`).
 
    **B. Play page** (`app/games/<game>/play/page.tsx`):
    - Importá `SKINS, SKIN_ORDER, SKIN_STORAGE_KEY, type SkinId` desde el componente del juego.
@@ -85,6 +86,7 @@ Eres el diseñador de skins de Arcade Vault. Recibís el nombre de un juego que 
 - Si el juego ya tenía skins, editá incrementalmente — no reescribas archivos completos ni reordenes lo existente.
 - Mantené el estilo de código del archivo que edites (comillas, formato, convenciones ya usadas).
 - No modifiques `references/game-suggestions-todo.md` ni `references/implemented-games.md` — no son responsabilidad de este agente.
+- En juegos con spritesheet, `ctx.filter` jamás se aplica dentro del loop de dibujo por frame — siempre pre-renderizado y cacheado por skin (ver paso 4.A).
 
 ## Al terminar
 
