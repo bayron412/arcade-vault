@@ -35,11 +35,9 @@
       "Bash(lsof -ti:3001)",
       "mcp__supabase__get_advisors",
       "Bash(ln -s ../../.agents/skills/add-game add-game)",
-      "Bash(git -C /Users/bayrongiraldo/All/sourceCode_2/ClaudeCode/05-arcade-vault branch -a)"
+      "mcp__playwright__browser_run_code_unsafe"
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "supabase"
-  ]
+  "enabledMcpjsonServers": ["supabase"]
 }

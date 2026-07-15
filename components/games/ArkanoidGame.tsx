@@ -232,10 +232,23 @@ export default function ArkanoidGame({
     // ── Audio ─────────────────────────────────────────────────────────────
     const bounceSound = new Audio('/games/arkanoid/sounds/ball-bounce.mp3');
     const breakSound = new Audio('/games/arkanoid/sounds/break-sound.mp3');
+    const activeSoundNodes = new Set<HTMLAudioElement>();
 
     function playSound(sound: HTMLAudioElement) {
       const node = sound.cloneNode() as HTMLAudioElement;
+      activeSoundNodes.add(node);
+      node.addEventListener('ended', () => activeSoundNodes.delete(node));
       node.play().catch(() => {});
+    }
+
+    function stopAllSounds() {
+      for (const node of activeSoundNodes) {
+        node.pause();
+        node.currentTime = 0;
+      }
+      activeSoundNodes.clear();
+      bounceSound.pause();
+      breakSound.pause();
     }
 
     // ── Estado ────────────────────────────────────────────────────────────
@@ -573,6 +586,7 @@ export default function ArkanoidGame({
     // ── Loop principal ───────────────────────────────────────────────────
     let lastTime: number | null = null;
     let rafId = 0;
+    let disposed = false;
 
     function loop(ts: number) {
       const dt = lastTime === null ? 0 : Math.min((ts - lastTime) / 1000, 0.05);
@@ -584,13 +598,16 @@ export default function ArkanoidGame({
     }
 
     loadSpritesheet(() => {
+      if (disposed) return;
       initPaddle();
       loadLevel(1);
       rafId = requestAnimationFrame(loop);
     });
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(rafId);
+      stopAllSounds();
       canvas.removeEventListener('click', handleClick);
       canvas.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('keydown', handleKeyDown);
