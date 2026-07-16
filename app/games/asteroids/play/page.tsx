@@ -6,12 +6,20 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/app/context/UserContext';
 import GameOverActions from '@/components/games/GameOverActions';
+import MobileGamepad, { type KeyMap } from '@/components/MobileGamepad';
 import {
   SKINS,
   SKIN_ORDER,
   SKIN_STORAGE_KEY,
   type SkinId,
 } from '@/components/games/AsteroidsGame';
+
+const KEY_MAP: KeyMap = {
+  up: 'ArrowUp',
+  left: 'ArrowLeft',
+  right: 'ArrowRight',
+  a: 'Space',
+};
 
 const AsteroidsGame = dynamic(
   () => import('@/components/games/AsteroidsGame'),
@@ -181,7 +189,7 @@ export default function AsteroidsPlayPage() {
       <div className="crt">
         <div
           ref={crtScreenRef}
-          className="crt-screen"
+          className="crt-screen w-full h-auto max-w-[800px]"
           style={
             screenWidth ? { width: screenWidth, margin: '0 auto' } : undefined
           }
@@ -225,6 +233,16 @@ export default function AsteroidsPlayPage() {
           <span>CARGA · 1MB</span>
         </div>
       </div>
+
+      <MobileGamepad
+        keyMap={KEY_MAP}
+        paused={paused}
+        onPauseToggle={() => setPaused((p) => !p)}
+        onExit={() => router.push(`/games/${game.id}`)}
+        skin={skin}
+        skinOptions={SKIN_ORDER.map((id) => ({ id, label: SKINS[id].label }))}
+        onSkinChange={(id) => changeSkin(id as SkinId)}
+      />
 
       {over && (
         <div className="modal-bd">

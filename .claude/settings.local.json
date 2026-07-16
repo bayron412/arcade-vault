@@ -35,9 +35,12 @@
       "Bash(lsof -ti:3001)",
       "mcp__supabase__get_advisors",
       "Bash(ln -s ../../.agents/skills/add-game add-game)",
-      "mcp__playwright__browser_run_code_unsafe"
+      "mcp__playwright__browser_run_code_unsafe",
+      "mcp__playwright__browser_close"
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["supabase"]
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }
