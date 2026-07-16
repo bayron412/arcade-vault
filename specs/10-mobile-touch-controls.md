@@ -39,9 +39,11 @@
     (el juego no tiene mecánica de lanzar bola: la bola se mueve automáticamente
     al cargar el nivel).
   - **Snake:** D-pad ↑↓←→ = `KeyW` / `KeyS` / `KeyA` / `KeyD` | A y B = sin acción.
-  - `MobileGamepad` solo renderiza los botones A/B cuya entrada correspondiente
-    (`a` / `b`) esté presente en el `keyMap`; si un juego no define esa tecla,
-    el botón no aparece.
+  - `MobileGamepad` siempre renderiza los 6 botones (D-pad ↑↓←→ + A + B) en los cuatro
+    juegos. Si un juego no define una tecla para alguno (`keyMap` sin esa entrada), el
+    botón se muestra deshabilitado (`disabled`, atenuado al 30% de opacidad,
+    `cursor: not-allowed`) en vez de ocultarse — el jugador ve el layout completo del
+    control incluso si algún botón no hace nada en ese juego.
 
 **Fuera de alcance:**
 
@@ -183,13 +185,17 @@ Juegos futuros definen su propio `keyMap` sin tocar el componente.
       PAUSA/SALIR) está oculto en los cuatro juegos.
 - [ ] El canvas escala para caber en pantalla móvil sin scroll horizontal.
 - [ ] El gamepad virtual aparece debajo del canvas en los cuatro juegos en móvil.
-- [ ] El D-pad de Asteroids mueve la nave (← → rotan, ↑ empuje continuo mientras se mantiene pulsado).
-- [ ] El botón A de Asteroids dispara; el botón B no se renderiza (el juego no tiene hiperespacio).
+- [ ] `MobileGamepad` siempre muestra los 6 botones (↑↓←→ + A + B) en los cuatro juegos;
+      los que no tienen acción en ese juego se ven deshabilitados/atenuados en vez de
+      ocultarse.
+- [ ] El D-pad de Asteroids mueve la nave (← → rotan, ↑ empuje continuo mientras se mantiene pulsado); ↓ está deshabilitado.
+- [ ] El botón A de Asteroids dispara; el botón B está deshabilitado (el juego no tiene hiperespacio).
 - [ ] El D-pad de Tetris mueve la pieza horizontalmente y la baja rápido con ↓.
 - [ ] El botón A de Tetris ejecuta hard drop (la pieza cae de una); el botón B la rota.
-- [ ] El D-pad de Arkanoid mueve la paleta horizontalmente; los botones A y B no se renderizan
-      (el juego no tiene mecánica de lanzar bola).
-- [ ] El D-pad de Snake cambia la dirección (sin permitir giro de 180°).
+- [ ] El D-pad de Arkanoid mueve la paleta horizontalmente; ↑ y ↓ están deshabilitados;
+      los botones A y B están deshabilitados (el juego no tiene mecánica de lanzar bola).
+- [ ] El D-pad de Snake cambia la dirección (sin permitir giro de 180°); los botones A y B
+      están deshabilitados.
 - [ ] El botón PAUSA del gamepad pausa y reanuda el juego en los cuatro juegos.
 - [ ] El botón SALIR del gamepad navega a `/games/<id>` en los cuatro juegos.
 - [ ] El `<select>` de skin del gamepad cambia el skin del juego activo y persiste en
@@ -254,8 +260,8 @@ Juegos futuros definen su propio `keyMap` sin tocar el componente.
 
 - **No: Hiperespacio en Asteroids** — el componente `AsteroidsGame` no implementa
   hiperespacio/teletransporte; no existe ningún listener para ello. En vez de añadir
-  la mecánica al canvas (fuera de alcance de este spec) o dejar un botón inerte, el
-  botón B simplemente no se renderiza en Asteroids (el `keyMap` no define `b`).
+  la mecánica al canvas (fuera de alcance de este spec), el botón B se muestra
+  deshabilitado en Asteroids (el `keyMap` no define `b`).
 
 - **Sí: A/B de Tetris = hard drop/voltear** — a petición del usuario durante la
   implementación, se cambió el mapeo original (A = rotar, B = hard drop) a
@@ -265,5 +271,13 @@ Juegos futuros definen su propio `keyMap` sin tocar el componente.
 
 - **No: Lanzar bola en Arkanoid** — el componente `ArkanoidGame` no tiene una mecánica
   de "bola pegada a la paleta, se lanza al pulsar". La bola se mueve automáticamente
-  al cargar cada nivel (`loadLevel`). Los botones A y B no se renderizan en Arkanoid
-  (el `keyMap` solo define `left`/`right`); el gamepad de Arkanoid es D-pad únicamente.
+  al cargar cada nivel (`loadLevel`). Los botones A, B, ▲ y ▼ se muestran deshabilitados
+  en Arkanoid (el `keyMap` solo define `left`/`right`).
+
+- **Sí: siempre mostrar los 6 botones, deshabilitados si no aplican** — a petición del
+  usuario durante la implementación, se cambió el comportamiento de "ocultar botones sin
+  acción" (decisiones anteriores) a "mostrar siempre los 6 botones, deshabilitados
+  (`disabled`, opacidad 30%) cuando el juego no define esa tecla en el `keyMap`". El
+  jugador ve el layout completo del control en los cuatro juegos; los botones
+  deshabilitados no reciben eventos de puntero (bloqueado nativamente por el atributo
+  `disabled`) y no despachan ningún `KeyboardEvent`.

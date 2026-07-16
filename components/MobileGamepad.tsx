@@ -37,7 +37,7 @@ function GamepadButton({
   label,
   style,
 }: {
-  code: string;
+  code?: string;
   label: string;
   style?: CSSProperties;
 }) {
@@ -47,12 +47,16 @@ function GamepadButton({
   // and let the browser fire a delayed "compatibility click" on whatever
   // element ends up under the finger — that's what was stealing focus onto
   // PAUSA and dropping D-pad keyup events).
+  const disabled = !code;
+
   const press = (e: ReactPointerEvent<HTMLButtonElement>) => {
+    if (!code) return;
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
     dispatchKey('keydown', code);
   };
   const release = (e: ReactPointerEvent<HTMLButtonElement>) => {
+    if (!code) return;
     e.preventDefault();
     dispatchKey('keyup', code);
   };
@@ -61,6 +65,7 @@ function GamepadButton({
     <button
       type="button"
       aria-label={label}
+      disabled={disabled}
       onPointerDown={press}
       onPointerUp={release}
       onPointerCancel={release}
@@ -76,6 +81,8 @@ function GamepadButton({
         touchAction: 'none',
         userSelect: 'none',
         WebkitTapHighlightColor: 'transparent',
+        opacity: disabled ? 0.3 : 1,
+        cursor: disabled ? 'not-allowed' : 'pointer',
         ...style,
       }}
     >
@@ -112,71 +119,57 @@ export default function MobileGamepad({
             gap: 4,
           }}
         >
-          {keyMap.up && (
-            <GamepadButton
-              code={keyMap.up}
-              label="▲"
-              style={{ gridColumn: 2, gridRow: 1 }}
-            />
-          )}
-          {keyMap.left && (
-            <GamepadButton
-              code={keyMap.left}
-              label="◀"
-              style={{ gridColumn: 1, gridRow: 2 }}
-            />
-          )}
-          {keyMap.right && (
-            <GamepadButton
-              code={keyMap.right}
-              label="▶"
-              style={{ gridColumn: 3, gridRow: 2 }}
-            />
-          )}
-          {keyMap.down && (
-            <GamepadButton
-              code={keyMap.down}
-              label="▼"
-              style={{ gridColumn: 2, gridRow: 3 }}
-            />
-          )}
+          <GamepadButton
+            code={keyMap.up}
+            label="▲"
+            style={{ gridColumn: 2, gridRow: 1 }}
+          />
+          <GamepadButton
+            code={keyMap.left}
+            label="◀"
+            style={{ gridColumn: 1, gridRow: 2 }}
+          />
+          <GamepadButton
+            code={keyMap.right}
+            label="▶"
+            style={{ gridColumn: 3, gridRow: 2 }}
+          />
+          <GamepadButton
+            code={keyMap.down}
+            label="▼"
+            style={{ gridColumn: 2, gridRow: 3 }}
+          />
         </div>
 
-        {(keyMap.a || keyMap.b) && (
-          <div
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            alignSelf: 'center',
+          }}
+        >
+          <GamepadButton
+            code={keyMap.b}
+            label="B"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              alignSelf: 'center',
+              width: 48,
+              height: 48,
+              color: 'var(--magenta)',
+              borderColor: 'var(--magenta)',
             }}
-          >
-            {keyMap.b && (
-              <GamepadButton
-                code={keyMap.b}
-                label="B"
-                style={{
-                  width: 48,
-                  height: 48,
-                  color: 'var(--magenta)',
-                  borderColor: 'var(--magenta)',
-                }}
-              />
-            )}
-            {keyMap.a && (
-              <GamepadButton
-                code={keyMap.a}
-                label="A"
-                style={{
-                  width: 48,
-                  height: 48,
-                  color: 'var(--cyan)',
-                  borderColor: 'var(--cyan)',
-                }}
-              />
-            )}
-          </div>
-        )}
+          />
+          <GamepadButton
+            code={keyMap.a}
+            label="A"
+            style={{
+              width: 48,
+              height: 48,
+              color: 'var(--cyan)',
+              borderColor: 'var(--cyan)',
+            }}
+          />
+        </div>
       </div>
 
       <div
