@@ -1,11 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/app/context/UserContext';
+import GameOverActions from '@/components/games/GameOverActions';
 import {
   SKINS,
   SKIN_ORDER,
@@ -252,14 +252,7 @@ export default function AsteroidsPlayPage() {
             ) : (
               <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
             )}
-            <div className="actions">
-              <button type="button" className="btn" onClick={restart}>
-                JUGAR DE NUEVO
-              </button>
-              <Link href="/games" className="btn magenta">
-                VOLVER AL VAULT
-              </Link>
-            </div>
+            <GameOverActions gameId={game.id} onRestart={restart} />
           </div>
         </div>
       )}
