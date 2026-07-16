@@ -5,8 +5,78 @@ import { useEffect, useRef } from 'react';
 const W = 800;
 const H = 600;
 
+export type SkinId = 'classic' | 'retro' | 'neon' | 'pixel';
+
+interface Skin {
+  label: string;
+  boardBg: string;
+  shipColor: string;
+  thrustColor: string;
+  asteroidColor: string;
+  bulletColor: string;
+  powerUpColor: string;
+  particleColor: string;
+  hudColor: string;
+  accent: string;
+}
+
+export const SKINS: Record<SkinId, Skin> = {
+  classic: {
+    label: 'CLASSIC',
+    boardBg: '#000000',
+    shipColor: '#ffffff',
+    thrustColor: 'rgba(255, 130, 0, 0.85)',
+    asteroidColor: '#ffffff',
+    bulletColor: '#ffffff',
+    powerUpColor: '#00ffff',
+    particleColor: '255, 255, 255',
+    hudColor: '#ffffff',
+    accent: '#ffffff',
+  },
+  retro: {
+    label: 'RETRO',
+    boardBg: '#0a0f0a',
+    shipColor: '#3ddc3d',
+    thrustColor: 'rgba(255, 176, 0, 0.85)',
+    asteroidColor: '#2fa83f',
+    bulletColor: '#3ddc3d',
+    powerUpColor: '#3ddc3d',
+    particleColor: '61, 220, 61',
+    hudColor: '#3ddc3d',
+    accent: '#3ddc3d',
+  },
+  neon: {
+    label: 'NEON',
+    boardBg: '#05010f',
+    shipColor: '#ff2bd6',
+    thrustColor: 'rgba(0, 240, 255, 0.9)',
+    asteroidColor: '#00f0ff',
+    bulletColor: '#ffe600',
+    powerUpColor: '#ff2bd6',
+    particleColor: '255, 43, 214',
+    hudColor: '#00f0ff',
+    accent: '#ff2bd6',
+  },
+  pixel: {
+    label: 'PIXEL ART',
+    boardBg: '#000000',
+    shipColor: '#ffffff',
+    thrustColor: 'rgba(255, 212, 0, 0.95)',
+    asteroidColor: '#ffd400',
+    bulletColor: '#ffffff',
+    powerUpColor: '#ffd400',
+    particleColor: '255, 212, 0',
+    hudColor: '#ffffff',
+    accent: '#ffd400',
+  },
+};
+
+export const SKIN_ORDER: SkinId[] = ['classic', 'retro', 'neon', 'pixel'];
+export const SKIN_STORAGE_KEY = 'av-asteroids-skin';
+
 interface AsteroidsGameProps {
   paused: boolean;
+  skin: SkinId;
   onScoreChange: (score: number) => void;
   onLivesChange: (lives: number) => void;
   onLevelChange: (level: number) => void;
@@ -17,6 +87,7 @@ type GameState = 'playing' | 'dead' | 'gameover';
 
 export default function AsteroidsGame({
   paused,
+  skin,
   onScoreChange,
   onLivesChange,
   onLevelChange,
@@ -24,6 +95,7 @@ export default function AsteroidsGame({
 }: AsteroidsGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
+  const skinRef = useRef<Skin>(SKINS[skin]);
   const callbacksRef = useRef({
     onScoreChange,
     onLivesChange,
@@ -34,6 +106,10 @@ export default function AsteroidsGame({
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
+
+  useEffect(() => {
+    skinRef.current = SKINS[skin];
+  }, [skin]);
 
   useEffect(() => {
     callbacksRef.current = {
@@ -124,7 +200,7 @@ export default function AsteroidsGame({
       }
 
       draw() {
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = skinRef.current.bulletColor;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -189,7 +265,7 @@ export default function AsteroidsGame({
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rot);
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = skinRef.current.asteroidColor;
         ctx.lineWidth = 1.5;
         ctx.lineJoin = 'round';
         ctx.beginPath();
@@ -237,12 +313,12 @@ export default function AsteroidsGame({
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(Math.PI / 4);
-        ctx.strokeStyle = '#0ff';
+        ctx.strokeStyle = skinRef.current.powerUpColor;
         ctx.lineWidth = 2;
         const r = this.radius * pulse;
         ctx.strokeRect(-r, -r, r * 2, r * 2);
         ctx.restore();
-        ctx.fillStyle = '#0ff';
+        ctx.fillStyle = skinRef.current.powerUpColor;
         ctx.font = 'bold 12px monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -331,7 +407,7 @@ export default function AsteroidsGame({
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle);
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = skinRef.current.shipColor;
         ctx.lineWidth = 1.5;
         ctx.lineJoin = 'round';
 
@@ -348,7 +424,7 @@ export default function AsteroidsGame({
           ctx.moveTo(-8, -4);
           ctx.lineTo(-8 - rand(6, 14), 0);
           ctx.lineTo(-8, 4);
-          ctx.strokeStyle = 'rgba(255, 130, 0, 0.85)';
+          ctx.strokeStyle = skinRef.current.thrustColor;
           ctx.stroke();
         }
 
@@ -387,7 +463,7 @@ export default function AsteroidsGame({
 
       draw() {
         const alpha = this.ttl / this.life;
-        ctx.strokeStyle = `rgba(255,255,255,${alpha.toFixed(2)})`;
+        ctx.strokeStyle = `rgba(${skinRef.current.particleColor},${alpha.toFixed(2)})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
@@ -551,7 +627,7 @@ export default function AsteroidsGame({
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(-Math.PI / 2);
-      ctx.strokeStyle = '#fff';
+      ctx.strokeStyle = skinRef.current.hudColor;
       ctx.lineWidth = 1.2;
       ctx.lineJoin = 'round';
       ctx.beginPath();
@@ -565,7 +641,7 @@ export default function AsteroidsGame({
     }
 
     function drawHUD() {
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = skinRef.current.hudColor;
       ctx.font = '15px monospace';
 
       ctx.textAlign = 'left';
@@ -578,13 +654,13 @@ export default function AsteroidsGame({
 
       if (ship.tripleShot > 0) {
         ctx.textAlign = 'left';
-        ctx.fillStyle = '#0ff';
+        ctx.fillStyle = skinRef.current.powerUpColor;
         ctx.fillText(`3x  ${ship.tripleShot.toFixed(1)}s`, 14, 46);
       }
     }
 
     function draw() {
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = skinRef.current.boardBg;
       ctx.fillRect(0, 0, W, H);
 
       particles.forEach((p) => p.draw());

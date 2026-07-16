@@ -2,6 +2,12 @@
 
 Registro de qué juegos ya tienen el sistema de skins (`SkinId`/`SKINS`/`SKIN_ORDER`/`SKIN_STORAGE_KEY`) y qué temas tiene cada uno. Mantenido por el agente `skin-designer`.
 
+## asteroids
+
+- Juego: Asteroids
+- Temas implementados: classic, retro, neon, pixel
+- Archivos: components/games/AsteroidsGame.tsx, app/games/asteroids/play/page.tsx
+
 ## snake
 
 - Juego: Snake
