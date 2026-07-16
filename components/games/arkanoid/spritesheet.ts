@@ -77,6 +77,29 @@ let ssImg: HTMLCanvasElement | null = null;
 let ssLoaded = false;
 const ssCallbacks: Array<() => void> = [];
 
+// Spritesheets filtered once per skin and cached, so ctx.filter never runs
+// inside the per-frame draw loop (CSS filters are software-rasterized and
+// re-applying them on every drawImage call at 60fps is expensive).
+const filteredCache = new Map<string, HTMLCanvasElement>();
+
+function getFilteredSheet(filter: string): HTMLCanvasElement | null {
+  if (!ssImg) return null;
+  if (!filter || filter === 'none') return ssImg;
+
+  const cached = filteredCache.get(filter);
+  if (cached) return cached;
+
+  const oc = document.createElement('canvas');
+  oc.width = ssImg.width;
+  oc.height = ssImg.height;
+  const octx = oc.getContext('2d');
+  if (!octx) return ssImg;
+  octx.filter = filter;
+  octx.drawImage(ssImg, 0, 0);
+  filteredCache.set(filter, oc);
+  return oc;
+}
+
 export function loadSpritesheet(cb: () => void): void {
   if (ssLoaded) {
     cb();
@@ -107,9 +130,12 @@ export function drawFrame(
   y: number,
   w: number,
   h: number,
+  filter?: string,
 ): void {
   if (!ssLoaded || !ssImg) return;
-  ctx.drawImage(ssImg, frame.sx, frame.sy, frame.sw, frame.sh, x, y, w, h);
+  const sheet = getFilteredSheet(filter ?? 'none');
+  if (!sheet) return;
+  ctx.drawImage(sheet, frame.sx, frame.sy, frame.sw, frame.sh, x, y, w, h);
 }
 
 export function drawSprite(
@@ -119,6 +145,7 @@ export function drawSprite(
   y: number,
   w: number,
   h: number,
+  filter?: string,
 ): void {
   if (!ssLoaded || !ssImg) return;
   let sp: SpriteFrame | undefined;
@@ -128,5 +155,7 @@ export function drawSprite(
     sp = SPRITES[name];
   }
   if (!sp) return;
-  ctx.drawImage(ssImg, sp.sx, sp.sy, sp.sw, sp.sh, x, y, w, h);
+  const sheet = getFilteredSheet(filter ?? 'none');
+  if (!sheet) return;
+  ctx.drawImage(sheet, sp.sx, sp.sy, sp.sw, sp.sh, x, y, w, h);
 }

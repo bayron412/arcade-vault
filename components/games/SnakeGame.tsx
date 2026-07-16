@@ -8,13 +8,78 @@ const W = GRID * CELL;
 const H = GRID * CELL;
 const TICK_MS = 1000 / 8;
 
-const BODY_SHADE_A = '#2fbf6a';
-const BODY_SHADE_B = '#249e56';
-const HEAD_COLOR = '#5dffab';
-const HEAD_GLOW = 'rgba(93, 255, 171, 0.85)';
+export type SkinId = 'classic' | 'retro' | 'neon' | 'pixel';
+
+interface Skin {
+  label: string;
+  boardBg: string;
+  bodyA: string;
+  bodyB: string;
+  headColor: string;
+  headGlow: string;
+  glowBlur: number;
+  eyeWhite: string;
+  eyePupil: string;
+  accent: string;
+}
+
+export const SKINS: Record<SkinId, Skin> = {
+  classic: {
+    label: 'CLASSIC',
+    boardBg: '#000000',
+    bodyA: '#2fbf6a',
+    bodyB: '#249e56',
+    headColor: '#5dffab',
+    headGlow: 'rgba(93, 255, 171, 0.85)',
+    glowBlur: 14,
+    eyeWhite: '#f4fff8',
+    eyePupil: '#04140a',
+    accent: '#5dffab',
+  },
+  retro: {
+    label: 'RETRO',
+    boardBg: '#0a0f0a',
+    bodyA: '#1f8f3f',
+    bodyB: '#157030',
+    headColor: '#3ddc3d',
+    headGlow: 'rgba(61, 220, 61, 0.85)',
+    glowBlur: 10,
+    eyeWhite: '#d9ffd9',
+    eyePupil: '#06170a',
+    accent: '#3ddc3d',
+  },
+  neon: {
+    label: 'NEON',
+    boardBg: '#05010f',
+    bodyA: '#00f0ff',
+    bodyB: '#0891a8',
+    headColor: '#ff2bd6',
+    headGlow: 'rgba(255, 43, 214, 0.9)',
+    glowBlur: 18,
+    eyeWhite: '#ffffff',
+    eyePupil: '#1a0f33',
+    accent: '#ff2bd6',
+  },
+  pixel: {
+    label: 'PIXEL ART',
+    boardBg: '#000000',
+    bodyA: '#ffffff',
+    bodyB: '#cfcfcf',
+    headColor: '#ffd400',
+    headGlow: 'rgba(0, 0, 0, 0)',
+    glowBlur: 0,
+    eyeWhite: '#ffffff',
+    eyePupil: '#000000',
+    accent: '#ffd400',
+  },
+};
+
+export const SKIN_ORDER: SkinId[] = ['classic', 'retro', 'neon', 'pixel'];
+export const SKIN_STORAGE_KEY = 'av-snake-skin';
 
 interface SnakeGameProps {
   paused: boolean;
+  skin: SkinId;
   onScoreChange: (score: number) => void;
   onLengthChange: (length: number) => void;
   onGameOver: (finalScore: number) => void;
@@ -89,17 +154,23 @@ interface Segment {
 
 export default function SnakeGame({
   paused,
+  skin,
   onScoreChange,
   onLengthChange,
   onGameOver,
 }: SnakeGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
+  const skinRef = useRef<Skin>(SKINS[skin]);
   const callbacksRef = useRef({ onScoreChange, onLengthChange, onGameOver });
 
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
+
+  useEffect(() => {
+    skinRef.current = SKINS[skin];
+  }, [skin]);
 
   useEffect(() => {
     callbacksRef.current = { onScoreChange, onLengthChange, onGameOver };
@@ -194,20 +265,22 @@ export default function SnakeGame({
     }
 
     function drawBody(seg: Segment, index: number) {
-      ctx.fillStyle = index % 2 === 0 ? BODY_SHADE_A : BODY_SHADE_B;
+      const skinNow = skinRef.current;
+      ctx.fillStyle = index % 2 === 0 ? skinNow.bodyA : skinNow.bodyB;
       ctx.beginPath();
       ctx.roundRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2, 6);
       ctx.fill();
     }
 
     function drawHead(seg: Segment) {
+      const skinNow = skinRef.current;
       const px = seg.x * CELL;
       const py = seg.y * CELL;
 
       ctx.save();
-      ctx.shadowColor = HEAD_GLOW;
-      ctx.shadowBlur = 14;
-      ctx.fillStyle = HEAD_COLOR;
+      ctx.shadowColor = skinNow.headGlow;
+      ctx.shadowBlur = skinNow.glowBlur;
+      ctx.fillStyle = skinNow.headColor;
       ctx.beginPath();
       ctx.roundRect(px + 1, py + 1, CELL - 2, CELL - 2, 10);
       ctx.fill();
@@ -251,12 +324,12 @@ export default function SnakeGame({
 
       const { dx, dy } = DIRECTION_DELTA[direction];
       for (const { ex, ey } of eyes) {
-        ctx.fillStyle = '#f4fff8';
+        ctx.fillStyle = skinNow.eyeWhite;
         ctx.beginPath();
         ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = '#04140a';
+        ctx.fillStyle = skinNow.eyePupil;
         ctx.beginPath();
         ctx.arc(
           ex + dx * pupilShift,
@@ -270,7 +343,7 @@ export default function SnakeGame({
     }
 
     function draw() {
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = skinRef.current.boardBg;
       ctx.fillRect(0, 0, W, H);
 
       for (let i = snake.length - 1; i >= 1; i--) {
