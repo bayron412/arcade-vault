@@ -1,6 +1,6 @@
 # SPEC 10 — Controles táctiles para dispositivos móviles
 
-> **Estado:** aprobado
+> **Estado:** implementado
 > **Depende de:** 05-asteroids-game, 07-tetris-game, 08-arkanoid-game, 09-snake-game
 > **Fecha:** 2026-05-21
 > **Objetivo:** Añadir controles táctiles (gamepad virtual) y layout adaptado a los
