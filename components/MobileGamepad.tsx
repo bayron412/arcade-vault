@@ -1,6 +1,11 @@
 'use client';
 
-import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react';
+import { useState } from 'react';
+import type {
+  CSSProperties,
+  PointerEvent as ReactPointerEvent,
+  ReactNode,
+} from 'react';
 
 export interface KeyMap {
   up?: string;
@@ -32,13 +37,41 @@ const dispatchKey = (type: 'keydown' | 'keyup', code: string) => {
   );
 };
 
+type DpadDirection = 'up' | 'down' | 'left' | 'right';
+
+const DPAD_ARROW_PATHS: Record<DpadDirection, string> = {
+  up: 'M12 4 L20 16 L4 16 Z',
+  right: 'M8 4 L20 12 L8 20 Z',
+  down: 'M4 8 L20 8 L12 20 Z',
+  left: 'M16 4 L16 20 L4 12 Z',
+};
+
+function DpadArrowIcon({ direction }: { direction: DpadDirection }) {
+  return (
+    <svg
+      className="mgp-dp-arrow"
+      viewBox="0 0 24 24"
+      width={22}
+      height={22}
+      aria-hidden="true"
+      style={{ display: 'block' }}
+    >
+      <path d={DPAD_ARROW_PATHS[direction]} fill="currentColor" />
+    </svg>
+  );
+}
+
 function GamepadButton({
   code,
   label,
+  icon,
+  className,
   style,
 }: {
   code?: string;
   label: string;
+  icon?: ReactNode;
+  className?: string;
   style?: CSSProperties;
 }) {
   // Pointer Events + pointer capture: locks the whole press/release gesture to
@@ -48,16 +81,19 @@ function GamepadButton({
   // element ends up under the finger — that's what was stealing focus onto
   // PAUSA and dropping D-pad keyup events).
   const disabled = !code;
+  const [pressed, setPressed] = useState(false);
 
   const press = (e: ReactPointerEvent<HTMLButtonElement>) => {
     if (!code) return;
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
+    setPressed(true);
     dispatchKey('keydown', code);
   };
   const release = (e: ReactPointerEvent<HTMLButtonElement>) => {
     if (!code) return;
     e.preventDefault();
+    setPressed(false);
     dispatchKey('keyup', code);
   };
 
@@ -66,6 +102,8 @@ function GamepadButton({
       type="button"
       aria-label={label}
       disabled={disabled}
+      data-pressed={pressed ? 'true' : undefined}
+      className={className}
       onPointerDown={press}
       onPointerUp={release}
       onPointerCancel={release}
@@ -75,9 +113,9 @@ function GamepadButton({
         fontSize: 14,
         fontWeight: 700,
         color: 'var(--ink)',
-        background: 'var(--bg-3)',
-        border: '1px solid var(--ink-faint)',
-        borderRadius: 8,
+        background: className ? undefined : 'var(--bg-3)',
+        border: className ? undefined : '1px solid var(--ink-faint)',
+        borderRadius: className ? undefined : 8,
         touchAction: 'none',
         userSelect: 'none',
         WebkitTapHighlightColor: 'transparent',
@@ -86,7 +124,7 @@ function GamepadButton({
         ...style,
       }}
     >
-      {label}
+      {icon ?? label}
     </button>
   );
 }
@@ -105,119 +143,122 @@ export default function MobileGamepad({
       className="flex md:hidden"
       style={{
         flexDirection: 'column',
-        gap: 12,
         marginTop: 16,
-        padding: '12px 8px',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 48px)',
-            gridTemplateRows: 'repeat(3, 48px)',
-            gap: 4,
-          }}
-        >
-          <GamepadButton
-            code={keyMap.up}
-            label="▲"
-            style={{ gridColumn: 2, gridRow: 1 }}
-          />
-          <GamepadButton
-            code={keyMap.left}
-            label="◀"
-            style={{ gridColumn: 1, gridRow: 2 }}
-          />
-          <GamepadButton
-            code={keyMap.right}
-            label="▶"
-            style={{ gridColumn: 3, gridRow: 2 }}
-          />
-          <GamepadButton
-            code={keyMap.down}
-            label="▼"
-            style={{ gridColumn: 2, gridRow: 3 }}
-          />
+      <div className="mgp">
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className="mgp-dpad">
+            <GamepadButton
+              code={keyMap.up}
+              label="up"
+              icon={<DpadArrowIcon direction="up" />}
+              className="mgp-dp mgp-dp-up"
+            />
+            <GamepadButton
+              code={keyMap.left}
+              label="left"
+              icon={<DpadArrowIcon direction="left" />}
+              className="mgp-dp mgp-dp-left"
+            />
+            <GamepadButton
+              code={keyMap.right}
+              label="right"
+              icon={<DpadArrowIcon direction="right" />}
+              className="mgp-dp mgp-dp-right"
+            />
+            <GamepadButton
+              code={keyMap.down}
+              label="down"
+              icon={<DpadArrowIcon direction="down" />}
+              className="mgp-dp mgp-dp-down"
+            />
+            <div className="mgp-dp-hub" aria-hidden="true">
+              <span className="mgp-dp-hub-gem" />
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              alignSelf: 'center',
+            }}
+          >
+            <GamepadButton
+              code={keyMap.b}
+              label="B"
+              className="mgp-ab mgp-ab-b"
+              icon={
+                <>
+                  <span className="mgp-ab-ring" />
+                  <span className="mgp-ab-letter">B</span>
+                </>
+              }
+            />
+            <GamepadButton
+              code={keyMap.a}
+              label="A"
+              className="mgp-ab mgp-ab-a"
+              icon={
+                <>
+                  <span className="mgp-ab-ring" />
+                  <span className="mgp-ab-letter">A</span>
+                </>
+              }
+            />
+          </div>
         </div>
 
         <div
           style={{
             display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            alignSelf: 'center',
+            alignItems: 'stretch',
+            gap: 8,
+            width: '100%',
+            marginTop: 12,
           }}
         >
-          <GamepadButton
-            code={keyMap.b}
-            label="B"
+          <select
+            value={skin}
+            onChange={(e) => onSkinChange(e.target.value)}
             style={{
-              width: 48,
-              height: 48,
-              color: 'var(--magenta)',
-              borderColor: 'var(--magenta)',
+              flex: 1,
+              minWidth: 0,
+              fontFamily: 'var(--mono)',
+              fontSize: 11,
+              letterSpacing: '0.06em',
+              color: 'var(--ink)',
+              background: 'var(--bg-3)',
+              border: '1px solid var(--ink-faint)',
+              borderRadius: 6,
+              padding: '8px 4px',
             }}
-          />
-          <GamepadButton
-            code={keyMap.a}
-            label="A"
-            style={{
-              width: 48,
-              height: 48,
-              color: 'var(--cyan)',
-              borderColor: 'var(--cyan)',
-            }}
-          />
+          >
+            {skinOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            className="btn yellow"
+            onClick={onPauseToggle}
+            style={{ flex: 1, minWidth: 0, fontSize: 11, padding: '8px 4px' }}
+          >
+            {paused ? 'REANUDAR' : 'PAUSA'}
+          </button>
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={onExit}
+            style={{ flex: 1, minWidth: 0, fontSize: 11, padding: '8px 4px' }}
+          >
+            SALIR
+          </button>
         </div>
-      </div>
-
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'stretch',
-          gap: 8,
-          width: '100%',
-        }}
-      >
-        <select
-          value={skin}
-          onChange={(e) => onSkinChange(e.target.value)}
-          style={{
-            flex: 1,
-            minWidth: 0,
-            fontFamily: 'var(--mono)',
-            fontSize: 11,
-            letterSpacing: '0.06em',
-            color: 'var(--ink)',
-            background: 'var(--bg-3)',
-            border: '1px solid var(--ink-faint)',
-            borderRadius: 6,
-            padding: '8px 4px',
-          }}
-        >
-          {skinOptions.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          className="btn yellow"
-          onClick={onPauseToggle}
-          style={{ flex: 1, minWidth: 0, fontSize: 11, padding: '8px 4px' }}
-        >
-          {paused ? 'REANUDAR' : 'PAUSA'}
-        </button>
-        <button
-          type="button"
-          className="btn ghost"
-          onClick={onExit}
-          style={{ flex: 1, minWidth: 0, fontSize: 11, padding: '8px 4px' }}
-        >
-          SALIR
-        </button>
       </div>
     </div>
   );
