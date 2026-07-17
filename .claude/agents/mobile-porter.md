@@ -123,3 +123,4 @@ Resumen en texto plano (no un informe extenso):
 - Si portaste: el `KEY_MAP` resultante, si necesitaste un aspect ratio custom, y qué botones quedaron deshabilitados por falta de mecánica en el motor.
 - Archivos modificados (play page + `references/mobile-ported-games.md`, y `app/globals.css` solo si agregaste la clase `player-hud`).
 - Recordatorio: verificar en viewport móvil (390 px) que el HUD desaparece, el canvas escala sin scroll horizontal, el gamepad aparece y responde, y correr `npm run build` sin errores.
+
