@@ -1,6 +1,6 @@
 # SPEC GAME-JAM — Leaderboard & Scores: FROGGER
 
-> **Estado:** Propuesto
+> **Estado:** Implementado
 > **Depende de:** 01-core-game.md
 > **Fecha:** 2026-07-14
 > **Objetivo:** Conectar FROGGER al modelo de datos existente de Supabase (`games`,
@@ -109,26 +109,26 @@ No se introducen tablas ni tipos TypeScript nuevos.
 
 ## Acceptance criteria
 
-- [ ] La fila `frogger` existe en la tabla `games` de Supabase con los valores del data
+- [x] La fila `frogger` existe en la tabla `games` de Supabase con los valores del data
       model.
-- [ ] La card de FROGGER aparece en `/games` con cover `cover-rana`, color `green` y
+- [x] La card de FROGGER aparece en `/games` con cover `cover-rana`, color `green` y
       categoría `ARCADE`.
-- [ ] Al terminar una partida, aparece el modal React de game over con la puntuación
+- [x] Al terminar una partida, aparece el modal React de game over con la puntuación
       final.
-- [ ] Al abrir el modal, el campo de nombre se pre-rellena con `av_player_name` de
+- [x] Al abrir el modal, el campo de nombre se pre-rellena con `av_player_name` de
       localStorage si existe.
-- [ ] Al confirmar, el score se inserta en Supabase y el nombre se persiste en
+- [x] Al confirmar, el score se inserta en Supabase y el nombre se persiste en
       localStorage.
-- [ ] El botón "GUARDAR PUNTUACIÓN" se deshabilita tras el primer envío (sin doble
+- [x] El botón "GUARDAR PUNTUACIÓN" se deshabilita tras el primer envío (sin doble
       inserción).
-- [ ] El botón "JUGAR DE NUEVO" reinicia la partida desde cero (score 0, 3 vidas, nivel 1).
-- [ ] El score guardado aparece en `/games/frogger` (top 10) y en `/hall-of-fame` al
+- [x] El botón "JUGAR DE NUEVO" reinicia la partida desde cero (score 0, 3 vidas, nivel 1).
+- [x] El score guardado aparece en `/games/frogger` (top 10) y en `/hall-of-fame` al
       recargar.
-- [ ] Cuando no hay scores para FROGGER, el leaderboard muestra "Sé el primero en entrar
+- [x] Cuando no hay scores para FROGGER, el leaderboard muestra "Sé el primero en entrar
       al salón de la fama".
-- [ ] `/hall-of-fame` muestra un tab para FROGGER sin cambios de código adicionales.
-- [ ] `npm run build` completa sin errores de TypeScript.
-- [ ] Ninguna ruta existente devuelve 500.
+- [x] `/hall-of-fame` muestra un tab para FROGGER sin cambios de código adicionales.
+- [x] `npm run build` completa sin errores de TypeScript.
+- [x] Ninguna ruta existente devuelve 500.
 
 ---
 

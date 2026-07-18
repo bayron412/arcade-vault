@@ -8,6 +8,12 @@ Registro de qué juegos ya tienen el sistema de skins (`SkinId`/`SKINS`/`SKIN_OR
 - Temas implementados: classic, retro, neon, pixel
 - Archivos: components/games/AsteroidsGame.tsx, app/games/asteroids/play/page.tsx
 
+## frogger
+
+- Juego: Frogger
+- Temas implementados: classic, retro, neon, pixel
+- Archivos: components/games/FroggerGame.tsx, app/games/frogger/play/page.tsx
+
 ## snake
 
 - Juego: Snake
