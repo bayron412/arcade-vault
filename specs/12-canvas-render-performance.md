@@ -1,6 +1,6 @@
 # SPEC 12 — Optimización de performance en el render loop de los 5 juegos
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** 07-tetris-game, 08-arkanoid-game, 09-snake-game, 05-asteroids-integracion (Frogger, `specs/game-jam/frogger/`)
 > **Fecha:** 2026-07-18
 > **Objetivo:** Reducir el costo de CPU/GPU del render loop de Frogger, Asteroids,
