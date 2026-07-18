@@ -1,6 +1,6 @@
 # SPEC GAME-JAM — Core Game: FROGGER
 
-> **Estado:** Propuesto
+> **Estado:** Implementado
 > **Depende de:** —
 > **Fecha:** 2026-07-14
 > **Objetivo:** Diseñar la mecánica completa de FROGGER, un clon fiel de Frogger (cruzar
@@ -187,32 +187,32 @@ interface Lane {
 
 ## Acceptance criteria
 
-- [ ] `/games/frogger/play` carga sin errores de SSR ni de TypeScript.
-- [ ] El canvas principal (520 × 520) se renderiza centrado con grid de 13 × 13 celdas.
-- [ ] La rana salta una celda por pulsación de flechas/WASD, con cooldown de animación
+- [x] `/games/frogger/play` carga sin errores de SSR ni de TypeScript.
+- [x] El canvas principal (520 × 520) se renderiza centrado con grid de 13 × 13 celdas.
+- [x] La rana salta una celda por pulsación de flechas/WASD, con cooldown de animación
       que evita saltos dobles instantáneos.
-- [ ] La rana no puede salir de los límites horizontales ni retroceder más allá de la
+- [x] La rana no puede salir de los límites horizontales ni retroceder más allá de la
       fila de salida.
-- [ ] Los 5 carriles de carretera mueven vehículos con direcciones y velocidades
+- [x] Los 5 carriles de carretera mueven vehículos con direcciones y velocidades
       alternadas; solapar con un vehículo resta una vida.
-- [ ] Los 5 carriles de río mueven troncos y tortugas; caer en el agua sin estar sobre
+- [x] Los 5 carriles de río mueven troncos y tortugas; caer en el agua sin estar sobre
       un flotador válido (o sobre una tortuga sumergida) resta una vida.
-- [ ] Estar sobre un tronco o tortuga arrastra a la rana con la corriente del carril;
+- [x] Estar sobre un tronco o tortuga arrastra a la rana con la corriente del carril;
       ser empujado fuera del tablero resta una vida.
-- [ ] Ocupar una casilla de meta vacía suma puntos y la marca como ocupada; una meta ya
+- [x] Ocupar una casilla de meta vacía suma puntos y la marca como ocupada; una meta ya
       ocupada o un seto no permite el salto.
-- [ ] Llenar las 5 metas incrementa el nivel, aumenta la velocidad de los carriles ~15%
+- [x] Llenar las 5 metas incrementa el nivel, aumenta la velocidad de los carriles ~15%
       y reinicia el tablero (metas vacías, rana en la fila de salida).
-- [ ] El temporizador de vida (25s) se muestra como barra en el HUD interno del canvas
+- [x] El temporizador de vida (25s) se muestra como barra en el HUD interno del canvas
       y, al llegar a 0, resta una vida.
-- [ ] Perder una vida con vidas restantes reposiciona la rana sin perder score ni nivel.
-- [ ] Al llegar a 0 vidas, se dispara `onGameOver(score)` y aparece el modal React de
+- [x] Perder una vida con vidas restantes reposiciona la rana sin perder score ni nivel.
+- [x] Al llegar a 0 vidas, se dispara `onGameOver(score)` y aparece el modal React de
       la plataforma con la puntuación final.
-- [ ] El HUD React de la plataforma refleja en tiempo real score, vidas y nivel.
-- [ ] El botón "PAUSA" congela vehículos, corriente y temporizador; "REANUDAR" lo reanuda.
-- [ ] El canvas no dibuja ningún overlay "GAME OVER" propio.
-- [ ] `npm run build` completa sin errores de TypeScript.
-- [ ] Ninguna ruta existente devuelve 500.
+- [x] El HUD React de la plataforma refleja en tiempo real score, vidas y nivel.
+- [x] El botón "PAUSA" congela vehículos, corriente y temporizador; "REANUDAR" lo reanuda.
+- [x] El canvas no dibuja ningún overlay "GAME OVER" propio.
+- [x] `npm run build` completa sin errores de TypeScript.
+- [x] Ninguna ruta existente devuelve 500.
 
 ---
 

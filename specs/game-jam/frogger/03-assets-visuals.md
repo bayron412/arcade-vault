@@ -1,6 +1,6 @@
 # SPEC GAME-JAM — Assets & Visuals: FROGGER
 
-> **Estado:** Propuesto
+> **Estado:** Implementado
 > **Depende de:** 01-core-game.md
 > **Fecha:** 2026-07-14
 > **Objetivo:** Definir la identidad visual de FROGGER — todo dibujado con primitivas de
@@ -134,23 +134,23 @@ Clase de cover reutilizada (ya existente en `app/globals.css`):
 
 ## Acceptance criteria
 
-- [ ] Todos los elementos visuales del juego (rana, vehículos, troncos, tortugas, agua,
+- [x] Todos los elementos visuales del juego (rana, vehículos, troncos, tortugas, agua,
       carretera, césped, setos, metas) se dibujan con primitivas de Canvas 2D, sin
       ninguna imagen externa cargada vía `drawImage`.
-- [ ] La paleta de color usa los tonos neón ya establecidos en la plataforma
+- [x] La paleta de color usa los tonos neón ya establecidos en la plataforma
       (magenta/cian/amarillo/verde) sobre fondos oscuros, coherente con el resto de
       juegos.
-- [ ] La rana es visualmente distinguible de vehículos, troncos y tortugas en todo
+- [x] La rana es visualmente distinguible de vehículos, troncos y tortugas en todo
       momento.
-- [ ] Las tortugas alternan entre estado visible y sumergido, y el estado sumergido se
+- [x] Las tortugas alternan entre estado visible y sumergido, y el estado sumergido se
       distingue visualmente (opacidad reducida) del estado flotante.
-- [ ] El HUD interno del canvas muestra score, vidas, nivel y una barra de temporizador
+- [x] El HUD interno del canvas muestra score, vidas, nivel y una barra de temporizador
       legibles sobre el fondo del tablero.
-- [ ] La card de FROGGER en `/games` y `/games/frogger` usa `cover-rana` sin introducir
+- [x] La card de FROGGER en `/games` y `/games/frogger` usa `cover-rana` sin introducir
       ninguna clase CSS nueva.
-- [ ] El HUD React de la plataforma (`app/games/frogger/play/page.tsx`) refleja score,
+- [x] El HUD React de la plataforma (`app/games/frogger/play/page.tsx`) refleja score,
       vidas y nivel en tiempo real, con el mismo patrón visual que Asteroids/Arkanoid.
-- [ ] No se añade ningún archivo a `public/games/frogger/` (no hay assets que copiar).
+- [x] No se añade ningún archivo a `public/games/frogger/` (no hay assets que copiar).
 
 ---
 
