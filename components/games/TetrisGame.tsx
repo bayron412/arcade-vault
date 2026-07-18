@@ -188,6 +188,9 @@ export default function TetrisGame({
   const [scale, setScale] = useState(1);
 
   const skinRef = useRef<Skin>(SKINS[skin]);
+  const skinIdRef = useRef<SkinId>(skin);
+  const gridCacheRef = useRef<HTMLCanvasElement | null>(null);
+  const gridCacheSkinRef = useRef<SkinId | null>(null);
 
   useEffect(() => {
     const el = outerRef.current;
@@ -217,6 +220,7 @@ export default function TetrisGame({
 
   useEffect(() => {
     skinRef.current = SKINS[skin];
+    skinIdRef.current = skin;
   }, [skin]);
 
   useEffect(() => {
@@ -389,21 +393,40 @@ export default function TetrisGame({
       context.globalAlpha = 1;
     }
 
-    function drawGrid() {
-      ctx.strokeStyle = skinRef.current.grid;
-      ctx.lineWidth = 0.5;
+    function buildGridCache() {
+      const cache = gridCacheRef.current ?? document.createElement('canvas');
+      cache.width = COLS * BLOCK;
+      cache.height = ROWS * BLOCK;
+      const gctx = cache.getContext('2d');
+      if (!gctx) return;
+
+      gctx.strokeStyle = skinRef.current.grid;
+      gctx.lineWidth = 0.5;
       for (let c = 1; c < COLS; c++) {
-        ctx.beginPath();
-        ctx.moveTo(c * BLOCK, 0);
-        ctx.lineTo(c * BLOCK, ROWS * BLOCK);
-        ctx.stroke();
+        gctx.beginPath();
+        gctx.moveTo(c * BLOCK, 0);
+        gctx.lineTo(c * BLOCK, ROWS * BLOCK);
+        gctx.stroke();
       }
       for (let r = 1; r < ROWS; r++) {
-        ctx.beginPath();
-        ctx.moveTo(0, r * BLOCK);
-        ctx.lineTo(COLS * BLOCK, r * BLOCK);
-        ctx.stroke();
+        gctx.beginPath();
+        gctx.moveTo(0, r * BLOCK);
+        gctx.lineTo(COLS * BLOCK, r * BLOCK);
+        gctx.stroke();
       }
+
+      gridCacheRef.current = cache;
+      gridCacheSkinRef.current = skinIdRef.current;
+    }
+
+    function drawGrid() {
+      if (
+        !gridCacheRef.current ||
+        gridCacheSkinRef.current !== skinIdRef.current
+      ) {
+        buildGridCache();
+      }
+      ctx.drawImage(gridCacheRef.current as HTMLCanvasElement, 0, 0);
     }
 
     function draw() {

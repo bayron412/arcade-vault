@@ -96,6 +96,9 @@ export default function AsteroidsGame({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
   const skinRef = useRef<Skin>(SKINS[skin]);
+  const skinIdRef = useRef<SkinId>(skin);
+  const bgCacheRef = useRef<HTMLCanvasElement | null>(null);
+  const bgCacheSkinRef = useRef<SkinId | null>(null);
   const callbacksRef = useRef({
     onScoreChange,
     onLivesChange,
@@ -109,6 +112,7 @@ export default function AsteroidsGame({
 
   useEffect(() => {
     skinRef.current = SKINS[skin];
+    skinIdRef.current = skin;
   }, [skin]);
 
   useEffect(() => {
@@ -262,7 +266,6 @@ export default function AsteroidsGame({
       }
 
       draw() {
-        ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rot);
         ctx.strokeStyle = skinRef.current.asteroidColor;
@@ -274,7 +277,8 @@ export default function AsteroidsGame({
           ctx.lineTo(this.verts[i][0], this.verts[i][1]);
         ctx.closePath();
         ctx.stroke();
-        ctx.restore();
+        ctx.rotate(-this.rot);
+        ctx.translate(-this.x, -this.y);
       }
     }
 
@@ -310,14 +314,14 @@ export default function AsteroidsGame({
       draw() {
         if (this.ttl < 2 && Math.floor(this.ttl * 8) % 2 === 0) return;
         const pulse = 0.85 + Math.sin(performance.now() / 150) * 0.15;
-        ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(Math.PI / 4);
         ctx.strokeStyle = skinRef.current.powerUpColor;
         ctx.lineWidth = 2;
         const r = this.radius * pulse;
         ctx.strokeRect(-r, -r, r * 2, r * 2);
-        ctx.restore();
+        ctx.rotate(-Math.PI / 4);
+        ctx.translate(-this.x, -this.y);
         ctx.fillStyle = skinRef.current.powerUpColor;
         ctx.font = 'bold 12px monospace';
         ctx.textAlign = 'center';
@@ -550,14 +554,16 @@ export default function AsteroidsGame({
     function update(dt: number) {
       if (state === 'gameover') {
         particles.forEach((p) => p.update(dt));
-        particles = particles.filter((p) => !p.dead);
+        if (particles.some((p) => p.dead))
+          particles = particles.filter((p) => !p.dead);
         return;
       }
 
       if (state === 'dead') {
         deadTimer -= dt;
         particles.forEach((p) => p.update(dt));
-        particles = particles.filter((p) => !p.dead);
+        if (particles.some((p) => p.dead))
+          particles = particles.filter((p) => !p.dead);
         asteroids.forEach((a) => a.update(dt));
         if (deadTimer <= 0) {
           state = 'playing';
@@ -576,9 +582,11 @@ export default function AsteroidsGame({
       particles.forEach((p) => p.update(dt));
       powerUps.forEach((p) => p.update(dt));
 
-      bullets = bullets.filter((b) => !b.dead);
-      particles = particles.filter((p) => !p.dead);
-      powerUps = powerUps.filter((p) => !p.dead);
+      if (bullets.some((b) => b.dead)) bullets = bullets.filter((b) => !b.dead);
+      if (particles.some((p) => p.dead))
+        particles = particles.filter((p) => !p.dead);
+      if (powerUps.some((p) => p.dead))
+        powerUps = powerUps.filter((p) => !p.dead);
 
       for (const p of powerUps) {
         if (!p.dead && dist(ship, p) < ship.radius + p.radius) {
@@ -607,8 +615,9 @@ export default function AsteroidsGame({
           }
         }
       }
-      asteroids = asteroids.filter((a) => !a.dead).concat(newAsteroids);
-      bullets = bullets.filter((b) => !b.dead);
+      if (asteroids.some((a) => a.dead) || newAsteroids.length > 0)
+        asteroids = asteroids.filter((a) => !a.dead).concat(newAsteroids);
+      if (bullets.some((b) => b.dead)) bullets = bullets.filter((b) => !b.dead);
 
       if (ship.invincible <= 0) {
         for (const a of asteroids) {
@@ -624,7 +633,6 @@ export default function AsteroidsGame({
 
     // ── Draw ────────────────────────────────────────────────────────────────
     function drawLifeIcon(x: number, y: number) {
-      ctx.save();
       ctx.translate(x, y);
       ctx.rotate(-Math.PI / 2);
       ctx.strokeStyle = skinRef.current.hudColor;
@@ -637,7 +645,8 @@ export default function AsteroidsGame({
       ctx.lineTo(-6, 5);
       ctx.closePath();
       ctx.stroke();
-      ctx.restore();
+      ctx.rotate(Math.PI / 2);
+      ctx.translate(-x, -y);
     }
 
     function drawHUD() {
@@ -659,9 +668,23 @@ export default function AsteroidsGame({
       }
     }
 
+    function buildBgCache() {
+      const cache = bgCacheRef.current ?? document.createElement('canvas');
+      cache.width = W;
+      cache.height = H;
+      const bctx = cache.getContext('2d');
+      if (!bctx) return;
+      bctx.fillStyle = skinRef.current.boardBg;
+      bctx.fillRect(0, 0, W, H);
+      bgCacheRef.current = cache;
+      bgCacheSkinRef.current = skinIdRef.current;
+    }
+
     function draw() {
-      ctx.fillStyle = skinRef.current.boardBg;
-      ctx.fillRect(0, 0, W, H);
+      if (!bgCacheRef.current || bgCacheSkinRef.current !== skinIdRef.current) {
+        buildBgCache();
+      }
+      ctx.drawImage(bgCacheRef.current as HTMLCanvasElement, 0, 0);
 
       particles.forEach((p) => p.draw());
       asteroids.forEach((a) => a.draw());
