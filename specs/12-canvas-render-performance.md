@@ -282,3 +282,60 @@ const bgCacheSkinRef = useRef<SkinId | null>(null); // solo en juegos con skins 
   cualitativo de "no cae por debajo del umbral en la máquina de desarrollo
   actual", no una garantía cross-device; no se bloquea el spec por
   diferencias de hardware ajenas al cambio de código.
+
+---
+
+## Findings & soluciones aplicadas (post-implementación)
+
+Notas reales encontradas al leer el código durante la implementación, donde
+difiere de lo asumido en el plan original, y cómo se resolvió cada caso:
+
+- **Tetris — el panel "next piece" nunca dibujó grid lines.** El plan asumía
+  que `drawGrid()` se usaba también en `drawNext()`. Al leer el código se
+  confirmó que `drawNext()` solo hace `fillRect` + `drawBlock` por celda, sin
+  ninguna línea de grid. Solución: se cacheó únicamente el grid del tablero
+  principal (`gridCacheRef`/`gridCacheSkinRef`, offscreen `COLS*BLOCK ×
+ROWS*BLOCK`); no se tocó `drawNext()` porque no había nada de grid que
+  cachear ahí.
+
+- **Asteroids — `boardBg` sí depende del skin**, contra la suposición
+  tentativa del plan ("no hay skin dinámico aquí salvo que se confirme lo
+  contrario"). Los 4 skins (`classic`/`retro`/`neon`/`pixel`) tienen
+  `boardBg` distinto. Solución: se agregó `skinIdRef`/`bgCacheSkinRef` igual
+  que en los demás juegos, invalidando y regenerando el cache del fondo al
+  cambiar de skin.
+
+- **`save()/restore()` con `translate()/rotate()` (Asteroids)** —
+  `Asteroid.draw()`, `PowerUp.draw()` y `drawLifeIcon` no solo cambiaban
+  `fillStyle`/`strokeStyle`, sino que aplicaban `ctx.translate()` +
+  `ctx.rotate()` antes de dibujar. Quitar `save()/restore()` ahí requiere
+  deshacer manualmente la transformación (rotar y trasladar en sentido
+  inverso al final de cada `draw()`) en vez de solo reasignar propiedades de
+  estilo, para no arrastrar la transformación acumulada al siguiente objeto
+  dibujado.
+
+- **Frogger — `shadowBlur` compartido entre vehículos de un mismo lane.**
+  Como el vehicle loop ya no hace `save()/restore()` por vehículo, se
+  estableció `ctx.shadowBlur = 10` una sola vez antes del loop interno de
+  vehículos de cada lane y se resetea a `0` justo después (antes de pasar a
+  floaters), en vez de por-vehículo, evitando que el glow se filtre a los
+  floaters (logs/turtles) dibujados en lanes posteriores.
+
+- **Snake — "FIN DEL JUEGO" instantáneo al cargar `/games/snake/play`.**
+  Se detectó este comportamiento durante la verificación visual con
+  Playwright. Se confirmó con `git stash` (revirtiendo temporalmente todos
+  los cambios de este spec) que el mismo comportamiento ya existía en el
+  código base _antes_ de esta implementación — es un bug preexistente sin
+  relación con el cacheo de fondo, fuera del alcance de este spec. No se
+  investigó ni modificó.
+
+- **Verificación de FPS real no reproducible vía automatización headless.**
+  Se intentó medir FPS con un muestreo de `requestAnimationFrame` vía
+  Playwright/Chromium headless, pero el resultado (~25 fps) no es confiable:
+  los navegadores headless/automatizados throttlean `requestAnimationFrame`
+  independientemente del costo real de render, lo cual no coincide con el
+  render visual (confirmado correcto por screenshots) ni con el pipeline de
+  compositor real de Chrome. La medición ≥ 55–60 FPS del criterio de
+  aceptación requiere el tab Rendering/Performance de Chrome DevTools en una
+  sesión de navegador real — quedó pendiente de validación manual por el
+  usuario, quien confirmó la implementación como correcta.
