@@ -217,6 +217,9 @@ export default function FroggerGame({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
   const skinRef = useRef<Skin>(SKINS[skin]);
+  const skinIdRef = useRef<SkinId>(skin);
+  const bgCacheRef = useRef<HTMLCanvasElement | null>(null);
+  const bgCacheSkinRef = useRef<SkinId | null>(null);
   const callbacksRef = useRef({
     onScoreChange,
     onLivesChange,
@@ -230,6 +233,7 @@ export default function FroggerGame({
 
   useEffect(() => {
     skinRef.current = SKINS[skin];
+    skinIdRef.current = skin;
   }, [skin]);
 
   useEffect(() => {
@@ -500,7 +504,13 @@ export default function FroggerGame({
       }
     }
 
-    function drawBackground() {
+    function buildBgCache() {
+      const cache = bgCacheRef.current ?? document.createElement('canvas');
+      cache.width = W;
+      cache.height = H;
+      const bctx = cache.getContext('2d');
+      if (!bctx) return;
+
       const c = skinRef.current;
       for (let row = 0; row < GRID_ROWS; row++) {
         let color = c.grassMedian;
@@ -509,24 +519,35 @@ export default function FroggerGame({
         else if (ROAD_ROWS.includes(row)) color = c.road;
         else if (RIVER_ROWS.includes(row)) color = c.water;
         else if (row === HOME_ROW) color = c.home;
-        ctx.fillStyle = color;
-        ctx.fillRect(0, row * CELL, W, CELL);
+        bctx.fillStyle = color;
+        bctx.fillRect(0, row * CELL, W, CELL);
       }
 
-      ctx.fillStyle = c.hedge;
+      bctx.fillStyle = c.hedge;
       for (let col = 0; col < GRID_COLS; col++) {
         if (HOME_COLUMNS.includes(col)) continue;
-        ctx.fillRect(col * CELL, 0, CELL, CELL);
-        ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-        ctx.lineWidth = 2;
+        bctx.fillRect(col * CELL, 0, CELL, CELL);
+        bctx.strokeStyle = 'rgba(0,0,0,0.25)';
+        bctx.lineWidth = 2;
         for (let i = -1; i < 3; i++) {
-          ctx.beginPath();
-          ctx.moveTo(col * CELL + i * 14, CELL);
-          ctx.lineTo(col * CELL + i * 14 + 14, 0);
-          ctx.stroke();
+          bctx.beginPath();
+          bctx.moveTo(col * CELL + i * 14, CELL);
+          bctx.lineTo(col * CELL + i * 14 + 14, 0);
+          bctx.stroke();
         }
       }
 
+      bgCacheRef.current = cache;
+      bgCacheSkinRef.current = skinIdRef.current;
+    }
+
+    function drawBackground() {
+      if (!bgCacheRef.current || bgCacheSkinRef.current !== skinIdRef.current) {
+        buildBgCache();
+      }
+      ctx.drawImage(bgCacheRef.current as HTMLCanvasElement, 0, 0);
+
+      const c = skinRef.current;
       HOME_COLUMNS.forEach((col, i) => {
         ctx.fillStyle = homesOccupied[i] ? c.homeOccupied : c.home;
         ctx.fillRect(col * CELL, 0, CELL, CELL);
@@ -548,16 +569,15 @@ export default function FroggerGame({
       };
       for (const lane of lanes) {
         if (lane.vehicles) {
+          ctx.shadowBlur = 10;
           for (const v of lane.vehicles) {
-            ctx.save();
             ctx.shadowColor = vehicleColor[v.type];
-            ctx.shadowBlur = 10;
             ctx.fillStyle = vehicleColor[v.type];
             ctx.beginPath();
             ctx.roundRect(v.x, lane.row * CELL + 6, v.width, CELL - 12, 6);
             ctx.fill();
-            ctx.restore();
           }
+          ctx.shadowBlur = 0;
         }
         if (lane.floaters) {
           for (const f of lane.floaters) {

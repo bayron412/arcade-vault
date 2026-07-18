@@ -182,6 +182,9 @@ export default function ArkanoidGame({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
   const skinRef = useRef<Skin>(SKINS[skin]);
+  const skinIdRef = useRef<SkinId>(skin);
+  const bgCacheRef = useRef<HTMLCanvasElement | null>(null);
+  const bgCacheSkinRef = useRef<SkinId | null>(null);
   const callbacksRef = useRef({
     onScoreChange,
     onLivesChange,
@@ -195,6 +198,7 @@ export default function ArkanoidGame({
 
   useEffect(() => {
     skinRef.current = SKINS[skin];
+    skinIdRef.current = skin;
   }, [skin]);
 
   useEffect(() => {
@@ -447,7 +451,10 @@ export default function ArkanoidGame({
       }
 
       for (const exp of explosions) exp.elapsed += dt * 1000;
-      explosions = explosions.filter((exp) => exp.elapsed < EXPLOSION_DURATION);
+      if (explosions.some((exp) => exp.elapsed >= EXPLOSION_DURATION))
+        explosions = explosions.filter(
+          (exp) => exp.elapsed < EXPLOSION_DURATION,
+        );
 
       if (ball.y > H) {
         lives--;
@@ -497,10 +504,24 @@ export default function ArkanoidGame({
       }
     }
 
+    function buildBgCache() {
+      const cache = bgCacheRef.current ?? document.createElement('canvas');
+      cache.width = W;
+      cache.height = H;
+      const bctx = cache.getContext('2d');
+      if (!bctx) return;
+      bctx.fillStyle = skinRef.current.bg;
+      bctx.fillRect(0, 0, W, H);
+      bgCacheRef.current = cache;
+      bgCacheSkinRef.current = skinIdRef.current;
+    }
+
     function draw() {
       const skin = skinRef.current;
-      ctx.fillStyle = skin.bg;
-      ctx.fillRect(0, 0, W, H);
+      if (!bgCacheRef.current || bgCacheSkinRef.current !== skinIdRef.current) {
+        buildBgCache();
+      }
+      ctx.drawImage(bgCacheRef.current as HTMLCanvasElement, 0, 0);
 
       const filter = skin.spriteFilter;
 

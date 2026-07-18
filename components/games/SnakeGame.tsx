@@ -162,6 +162,9 @@ export default function SnakeGame({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
   const skinRef = useRef<Skin>(SKINS[skin]);
+  const skinIdRef = useRef<SkinId>(skin);
+  const bgCacheRef = useRef<HTMLCanvasElement | null>(null);
+  const bgCacheSkinRef = useRef<SkinId | null>(null);
   const callbacksRef = useRef({ onScoreChange, onLengthChange, onGameOver });
 
   useEffect(() => {
@@ -170,6 +173,7 @@ export default function SnakeGame({
 
   useEffect(() => {
     skinRef.current = SKINS[skin];
+    skinIdRef.current = skin;
   }, [skin]);
 
   useEffect(() => {
@@ -342,9 +346,23 @@ export default function SnakeGame({
       }
     }
 
+    function buildBgCache() {
+      const cache = bgCacheRef.current ?? document.createElement('canvas');
+      cache.width = W;
+      cache.height = H;
+      const bctx = cache.getContext('2d');
+      if (!bctx) return;
+      bctx.fillStyle = skinRef.current.boardBg;
+      bctx.fillRect(0, 0, W, H);
+      bgCacheRef.current = cache;
+      bgCacheSkinRef.current = skinIdRef.current;
+    }
+
     function draw() {
-      ctx.fillStyle = skinRef.current.boardBg;
-      ctx.fillRect(0, 0, W, H);
+      if (!bgCacheRef.current || bgCacheSkinRef.current !== skinIdRef.current) {
+        buildBgCache();
+      }
+      ctx.drawImage(bgCacheRef.current as HTMLCanvasElement, 0, 0);
 
       for (let i = snake.length - 1; i >= 1; i--) {
         drawBody(snake[i], i);
