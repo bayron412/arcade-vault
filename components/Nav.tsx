@@ -16,8 +16,10 @@ const CREDITS = '03';
 
 export default function Nav() {
   const pathname = usePathname();
-  const { user, signOut } = useUser();
+  const { user, username, signOut } = useUser();
   const [open, setOpen] = useState(false);
+  const displayName = username ?? 'JUGADOR';
+  const initial = displayName.charAt(0).toUpperCase();
 
   const closeDrawer = () => setOpen(false);
 
@@ -52,9 +54,17 @@ export default function Nav() {
 
         <div className="auth-btn">
           {user ? (
-            <button type="button" className="btn ghost" onClick={signOut}>
-              {user} ▾
-            </button>
+            <div className="auth-user">
+              <span className="avatar">{initial}</span>
+              <span className="username">{displayName}</span>
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => signOut()}
+              >
+                Cerrar sesión
+              </button>
+            </div>
           ) : (
             <Link href="/auth" className="btn">
               Iniciar Sesión
@@ -77,7 +87,10 @@ export default function Nav() {
         onClick={closeDrawer}
       />
       <div className={`av-mobile-panel ${open ? 'open' : ''}`}>
-        <div className="pixel neon-cyan" style={{ fontSize: 11, marginBottom: 16 }}>
+        <div
+          className="pixel neon-cyan"
+          style={{ fontSize: 11, marginBottom: 16 }}
+        >
           MENÚ
         </div>
         {LINKS.map((link) => (
@@ -91,8 +104,15 @@ export default function Nav() {
           </Link>
         ))}
         {user ? (
-          <Link href="/" className="" onClick={() => { signOut(); closeDrawer(); }}>
-            Cerrar sesión ({user})
+          <Link
+            href="/"
+            className=""
+            onClick={() => {
+              signOut();
+              closeDrawer();
+            }}
+          >
+            Cerrar sesión ({displayName})
           </Link>
         ) : (
           <Link
@@ -106,7 +126,11 @@ export default function Nav() {
         <div style={{ flex: 1 }} />
         <div
           className="pixel"
-          style={{ fontSize: 9, color: 'var(--ink-faint)', letterSpacing: '0.16em' }}
+          style={{
+            fontSize: 9,
+            color: 'var(--ink-faint)',
+            letterSpacing: '0.16em',
+          }}
         >
           CRÉDITOS · {CREDITS}
         </div>
