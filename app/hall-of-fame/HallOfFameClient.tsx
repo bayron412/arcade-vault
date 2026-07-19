@@ -11,7 +11,7 @@ function formatDate(iso: string) {
 }
 
 export default function HallOfFameClient({ games }: { games: GameRow[] }) {
-  const { user } = useUser();
+  const { username } = useUser();
   const [tab, setTab] = useState(games[0]?.id ?? '');
   const [scores, setScores] = useState<ScoreRow[]>([]);
   const game = games.find((g) => g.id === tab);
@@ -37,9 +37,9 @@ export default function HallOfFameClient({ games }: { games: GameRow[] }) {
     };
   }, [tab]);
 
-  const youIndex = user
+  const youIndex = username
     ? scores.findIndex(
-        (s) => s.player_name.toLowerCase() === user.toLowerCase(),
+        (s) => s.player_name.toLowerCase() === username.toLowerCase(),
       )
     : -1;
   const youEntry = youIndex >= 0 ? scores[youIndex] : null;

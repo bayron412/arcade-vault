@@ -33,14 +33,14 @@ const FROGGER_ASPECT = 1;
 
 export default function FroggerPlayPage() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, username } = useUser();
 
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [level, setLevel] = useState(1);
   const [paused, setPaused] = useState(false);
   const [over, setOver] = useState(false);
-  const [name, setName] = useState(user ?? 'INVITADO');
+  const [name, setName] = useState(username ?? 'INVITADO');
   const [saved, setSaved] = useState(false);
   const [gameKey, setGameKey] = useState(0);
   const [skin, setSkin] = useState<SkinId>('classic');
@@ -86,9 +86,13 @@ export default function FroggerPlayPage() {
 
   useEffect(() => {
     if (!over) return;
+    if (username) {
+      setName(username);
+      return;
+    }
     const stored = localStorage.getItem('av_player_name');
     if (stored) setName(stored);
-  }, [over]);
+  }, [over, username]);
 
   useEffect(() => {
     const stored = localStorage.getItem(SKIN_STORAGE_KEY) as SkinId | null;
@@ -109,7 +113,7 @@ export default function FroggerPlayPage() {
       game_id: game.id,
       player_name: name,
       score,
-      user_id: null,
+      user_id: user?.id ?? null,
     });
   };
 
