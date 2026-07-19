@@ -19,6 +19,18 @@ interface UserContextValue {
 
 const UserContext = createContext<UserContextValue | undefined>(undefined);
 
+function deriveUsername(user: User | null): string | null {
+  if (!user) return null;
+  const metadata = user.user_metadata ?? {};
+  const raw =
+    (metadata.username as string | undefined) ??
+    (metadata.full_name as string | undefined) ??
+    (metadata.name as string | undefined) ??
+    user.email?.split('@')[0] ??
+    null;
+  return raw ? raw.toUpperCase().slice(0, 10) : null;
+}
+
 export function UserProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
 
@@ -43,8 +55,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   const user = session?.user ?? null;
-  const username =
-    (user?.user_metadata?.username as string | undefined) ?? null;
+  const username = deriveUsername(user);
 
   return (
     <UserContext.Provider value={{ user, session, username, signOut }}>

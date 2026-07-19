@@ -37,7 +37,8 @@
       "Bash(ln -s ../../.agents/skills/add-game add-game)",
       "mcp__playwright__browser_run_code_unsafe",
       "mcp__playwright__browser_close",
-      "mcp__playwright__browser_find"
+      "mcp__playwright__browser_find",
+      "mcp__supabase__get_logs"
     ]
   },
   "enableAllProjectMcpServers": true,
