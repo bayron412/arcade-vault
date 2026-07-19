@@ -23,12 +23,20 @@ No test runner configured.
 
 Usa siempre `/frontend-design` para diseñar la interfaz de usuario.
 
+Skills locales (`.claude/skills/`), además de `spec` / `spec-impl` (Spec Driven Design, vía `skills-lock.json`):
+
+- **`add-game`** — genera el spec de un juego canvas nuevo (`specs/NN-<slug>-game.md`); no escribe código.
+- **`spec-impl-game`** — implementa un spec de juego aprobado (archivo único o carpeta `game-jam/`) y al terminar corre en secuencia los agentes `skin-designer` y `mobile-porter`.
+
 ## Agentes
 
-- **`game-planner`** (`.claude/agents/game-planner.md`) — planifica y sugiere el próximo juego a implementar **eligiendo entre varios candidatos posibles**, cuando el usuario NO nombró un juego concreto. Lee el catálogo actual (`references/implemented-games.md`), evalúa candidatos por diversidad de género, factibilidad en canvas 2D y reconocimiento clásico, y mantiene una memoria persistente de sugerencias en `references/game-suggestions-todo.md`. Úsalo cuando el usuario pregunte qué juego sigue o pida ideas sin nombrar uno específico.
-- **`game-jam`** (`.claude/agents/game-jam.md`) — recibe un **tema** o el **nombre de un juego clásico concreto** (ej. "Frogger", "Pac-Man") y diseña automáticamente UN juego arcade, generando 3 archivos de spec completos (`01-core-game.md`, `02-leaderboard-scores.md`, `03-assets-visuals.md`) dentro de `specs/game-jam/<game-id>/`, con el mismo formato que los specs 07–09. Es independiente del `game-planner` (no toca `references/game-suggestions-todo.md`). **Si el usuario nombra un juego concreto, siempre usa `game-jam`, nunca `game-planner`** — incluso si ese juego ya figura como sugerencia pendiente en el to-do de `game-planner`.
-- **`skin-designer`** (`.claude/agents/skin-designer.md`) — recibe el **nombre de un juego ya implementado** en `app/games/` y garantiza que tenga al menos **4 skins** (`neon`, `retro`, `pixel-art` y `classic`/default), **implementándolas en código** siguiendo el patrón ya existente en Tetris (`SkinId`/`SKINS`/`SKIN_ORDER`/`SKIN_STORAGE_KEY` en el componente del juego + selector con persistencia en `localStorage` en la play page). Solo agrega las skins que falten, conservando cualquier skin extra ya presente. No crea juegos nuevos (eso es `game-jam`) ni sugiere qué juego sigue (eso es `game-planner`).
-- **`mobile-porter`** (`.claude/agents/mobile-porter.md`) — recibe el **nombre de un juego ya implementado** en `app/games/` que **todavía no tiene soporte táctil** y le añade el gamepad virtual (`components/MobileGamepad.tsx`), el `KeyMap` y el escalado de canvas siguiendo el patrón de `specs/10-mobile-touch-controls.md`, para que se vea bien tanto en web como en la app móvil. Mantiene un registro persistente en `references/mobile-ported-games.md`. **Nunca modifica el mobile de los 4 juegos base** (`asteroids`, `tetris`, `arkanoid`, `snake`) — ya está implementado y validado. No diseña juegos nuevos (eso es `game-jam`), no agrega skins (eso es `skin-designer`) y no sugiere qué juego sigue (eso es `game-planner`).
+- **`game-planner`** — sugiere el próximo juego a implementar eligiendo entre varios candidatos, cuando el usuario NO nombró uno concreto. Detalle: `.claude/agents/game-planner.md`.
+- **`game-jam`** — recibe un tema o el nombre de un juego clásico concreto y genera los 3 specs del juego en `specs/game-jam/<game-id>/`. Detalle: `.claude/agents/game-jam.md`.
+- **`skin-designer`** — garantiza al menos 4 skins en un juego ya implementado. Detalle: `.claude/agents/skin-designer.md`.
+- **`mobile-porter`** — añade soporte táctil a un juego que aún no lo tiene (nunca a los 4 juegos base). Detalle: `.claude/agents/mobile-porter.md`.
+- **`game-performance-booster`** — audita/optimiza el render loop Canvas 2D de un juego según `specs/12-canvas-render-performance.md`. Detalle: `.claude/agents/game-performance-booster.md`.
+
+Regla clave: si el usuario nombra un juego concreto, siempre usa `game-jam`, nunca `game-planner` — incluso si ese juego ya figura como sugerencia pendiente en el to-do de `game-planner`.
 
 ## Architecture
 
@@ -41,7 +49,7 @@ App Router exclusively — no `pages/` directory.
 - `about/` — about + contact form
 - `api/contact/` — Resend-backed contact endpoint
 - `auth/` — Supabase auth page
-- `games/` — games index (`GamesGrid.tsx`) + per-game routes like: `arkanoid`, `asteroids`, `snake`, `tetris` and more...
+- `games/` — games index (`GamesGrid.tsx`) + per-game routes like: `arkanoid`, `asteroids`, `snake`, `tetris`, `frogger` and more...
   (see `references/implemented-games.md`) when you need to check which games are implemented and how to implement new ones.
 
 - `games/[id]/` — dynamic game detail with nested `play/` route
@@ -53,13 +61,13 @@ App Router exclusively — no `pages/` directory.
 ### Shared code
 
 - `components/Nav.tsx` — top navigation
-- `components/games/` — canvas game implementations (`ArkanoidGame`, `AsteroidsGame`, `SnakeGame`, `TetrisGame`)
+- `components/games/` — canvas game implementations (`ArkanoidGame`, `AsteroidsGame`, `SnakeGame`, `TetrisGame`, `FroggerGame`), shared `GameOverActions.tsx`, and per-game asset subfolders (e.g. `arkanoid/spritesheet.ts`)
 - `lib/supabase/` — `client.ts` (browser), `server.ts` (RSC/route handlers), `types.ts` (DB types)
 - `public/` — sprite sheets (`spritesheet-breakout.png`, `fruits.png`) and audio (`ball-bounce.mp3`, `break-sound.mp3`)
 
 ### Specs
 
-`specs/` holds the spec-driven design history (01 → 09): MVP screens, landing, about+contact, Supabase integration, each game, and the shared games-table/leaderboard schema.
+`specs/` holds the spec-driven design history, plus `specs/game-jam` for thematic jams.
 
 ## Conventions
 

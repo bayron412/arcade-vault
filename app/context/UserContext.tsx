@@ -1,5 +1,6 @@
 'use client';
 
+import type { Session, User } from '@supabase/supabase-js';
 import {
   createContext,
   useContext,
@@ -7,37 +8,46 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-
-const STORAGE_KEY = 'av_user';
+import { createClient } from '@/lib/supabase/client';
 
 interface UserContextValue {
-  user: string | null;
-  login: (name: string) => void;
-  signOut: () => void;
+  user: User | null;
+  session: Session | null;
+  username: string | null;
+  signOut: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextValue | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<string | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored) setUser(stored);
+    const supabase = createClient();
+
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = (name: string) => {
-    window.localStorage.setItem(STORAGE_KEY, name);
-    setUser(name);
+  const signOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setSession(null);
   };
 
-  const signOut = () => {
-    window.localStorage.removeItem(STORAGE_KEY);
-    setUser(null);
-  };
+  const user = session?.user ?? null;
+  const username =
+    (user?.user_metadata?.username as string | undefined) ?? null;
 
   return (
-    <UserContext.Provider value={{ user, login, signOut }}>
+    <UserContext.Provider value={{ user, session, username, signOut }}>
       {children}
     </UserContext.Provider>
   );
