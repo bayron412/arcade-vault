@@ -10,9 +10,14 @@ export const createClient = async () => {
       cookies: {
         getAll: () => cookieStore.getAll(),
         setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
-          );
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options),
+            );
+          } catch {
+            // Called from a Server Component; safe to ignore because
+            // proxy.ts refreshes the session on every request.
+          }
         },
       },
     },
