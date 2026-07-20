@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 type Tab = 'login' | 'register';
@@ -10,7 +10,17 @@ type View = 'form' | 'register-success' | 'forgot-password' | 'forgot-success';
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
 export default function AuthPage() {
+  return (
+    <Suspense fallback={null}>
+      <AuthPageInner />
+    </Suspense>
+  );
+}
+
+function AuthPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackError = searchParams.get('error') === 'callback';
   const [tab, setTab] = useState<Tab>('login');
   const [view, setView] = useState<View>('form');
   const [username, setUsername] = useState('');
@@ -74,7 +84,7 @@ export default function AuthPage() {
     const supabase = createClient();
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(
       forgotEmail,
-      { redirectTo: `${window.location.origin}/auth/reset-password` },
+      { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password` },
     );
     setLoading(false);
     if (resetError) {
@@ -89,7 +99,9 @@ export default function AuthPage() {
     const supabase = createClient();
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      },
     });
     if (oauthError) setError(oauthError.message);
   };
@@ -112,6 +124,20 @@ export default function AuthPage() {
             ACCESO AL SISTEMA · v2.6
           </div>
         </div>
+
+        {callbackError && (
+          <div
+            className="mono"
+            style={{
+              color: 'var(--neon-red, #ff4444)',
+              fontSize: 12,
+              textAlign: 'center',
+              padding: '10px 0',
+            }}
+          >
+            El enlace de acceso ha expirado o es inválido. Inténtalo de nuevo.
+          </div>
+        )}
 
         {view === 'register-success' && (
           <div
@@ -238,6 +264,9 @@ export default function AuthPage() {
                 <input
                   id="password"
                   type="password"
+                  autoComplete={
+                    tab === 'login' ? 'current-password' : 'new-password'
+                  }
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
