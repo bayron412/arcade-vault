@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/client';
 type Tab = 'login' | 'register';
 type View = 'form' | 'register-success' | 'forgot-password' | 'forgot-success';
 
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
 export default function AuthPage() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('login');
@@ -16,11 +18,21 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [forgotEmail, setForgotEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setPasswordError(null);
+
+    if (tab === 'register' && !PASSWORD_REGEX.test(password)) {
+      setPasswordError(
+        'La contraseña debe tener mínimo 8 caracteres e incluir mayúsculas, minúsculas, números y símbolos.',
+      );
+      return;
+    }
+
     setLoading(true);
     const supabase = createClient();
 
@@ -177,6 +189,7 @@ export default function AuthPage() {
                 onClick={() => {
                   setTab('login');
                   setError(null);
+                  setPasswordError(null);
                 }}
               >
                 INICIAR SESIÓN
@@ -187,6 +200,7 @@ export default function AuthPage() {
                 onClick={() => {
                   setTab('register');
                   setError(null);
+                  setPasswordError(null);
                 }}
               >
                 CREAR CUENTA
@@ -225,10 +239,25 @@ export default function AuthPage() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordError(null);
+                  }}
                   placeholder="••••••••"
                   required
                 />
+                {tab === 'register' && passwordError && (
+                  <div
+                    className="mono"
+                    style={{
+                      color: 'var(--danger, #ff4d6d)',
+                      fontSize: 12,
+                      marginTop: 6,
+                    }}
+                  >
+                    {passwordError}
+                  </div>
+                )}
               </div>
 
               {tab === 'login' && (
