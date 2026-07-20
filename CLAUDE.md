@@ -35,6 +35,7 @@ Skills locales (`.claude/skills/`), además de `spec` / `spec-impl` (Spec Driven
 - **`skin-designer`** — garantiza al menos 4 skins en un juego ya implementado. Detalle: `.claude/agents/skin-designer.md`.
 - **`mobile-porter`** — añade soporte táctil a un juego que aún no lo tiene (nunca a los 4 juegos base). Detalle: `.claude/agents/mobile-porter.md`.
 - **`game-performance-booster`** — audita/optimiza el render loop Canvas 2D de un juego según `specs/12-canvas-render-performance.md`. Detalle: `.claude/agents/game-performance-booster.md`.
+- **`security-auditor`** — audita (read-only) la seguridad de la app y de la base de datos (RLS, políticas, advisors Supabase) según `specs/14-security-hardening.md`. Detalle: `.claude/agents/security-auditor.md`.
 
 Regla clave: si el usuario nombra un juego concreto, siempre usa `game-jam`, nunca `game-planner` — incluso si ese juego ya figura como sugerencia pendiente en el to-do de `game-planner`.
 
