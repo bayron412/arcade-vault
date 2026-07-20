@@ -84,7 +84,7 @@ function AuthPageInner() {
     const supabase = createClient();
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(
       forgotEmail,
-      { redirectTo: `${window.location.origin}/auth/reset-password` },
+      { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password` },
     );
     setLoading(false);
     if (resetError) {
@@ -99,7 +99,9 @@ function AuthPageInner() {
     const supabase = createClient();
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      },
     });
     if (oauthError) setError(oauthError.message);
   };
