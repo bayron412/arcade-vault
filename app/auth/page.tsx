@@ -264,6 +264,9 @@ function AuthPageInner() {
                 <input
                   id="password"
                   type="password"
+                  autoComplete={
+                    tab === 'login' ? 'current-password' : 'new-password'
+                  }
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
