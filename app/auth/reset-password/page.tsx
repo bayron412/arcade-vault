@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client';
 
 type Status = 'checking' | 'ready' | 'invalid' | 'success';
 
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
 export default function ResetPasswordPage() {
   const [status, setStatus] = useState<Status>('checking');
   const [password, setPassword] = useState('');
@@ -22,6 +24,13 @@ export default function ResetPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!PASSWORD_REGEX.test(password)) {
+      setError(
+        'La contraseña debe tener mínimo 8 caracteres e incluir mayúsculas, minúsculas, números y símbolos.',
+      );
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
@@ -108,6 +117,7 @@ export default function ResetPasswordPage() {
               <input
                 id="new-password"
                 type="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
@@ -120,6 +130,7 @@ export default function ResetPasswordPage() {
               <input
                 id="confirm-password"
                 type="password"
+                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
