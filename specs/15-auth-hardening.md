@@ -1,6 +1,6 @@
 # SPEC 15 — Hardening de autenticación: política de contraseña, callback OAuth y autocomplete
 
-> **Estado:** aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 13 · SPEC 14
 > **Fecha:** 2026-05-27
 > **Objetivo:** Corregir cuatro vulnerabilidades detectadas en la revisión de
